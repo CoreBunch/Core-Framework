@@ -34,9 +34,16 @@ jobs:
       - name: Install JavaScript dependencies
         run: bun install --frozen-lockfile
 
+      - name: Audit critical JavaScript dependencies
+        run: bun audit --audit-level=critical
+
       - name: Install PHP development dependencies
         working-directory: packages/wp
         run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Audit PHP dependencies
+        working-directory: packages/wp
+        run: composer audit --locked --no-interaction
 
       - name: Test web application
         working-directory: packages/www

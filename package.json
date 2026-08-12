@@ -17,6 +17,23 @@
 		"url": "https://github.com/corebunch/core-framework/issues"
 	},
 	"workspaces": ["packages/*"],
+	"overrides": {
+		"@babel/core": "7.29.7",
+		"@babel/plugin-transform-modules-systemjs": "7.29.8",
+		"basic-ftp": "5.3.1",
+		"fast-uri": "3.1.5",
+		"flatted": "3.4.4",
+		"follow-redirects": "1.16.0",
+		"http-proxy-middleware": "2.0.10",
+		"ip-address": "10.5.0",
+		"lodash-es": "4.18.1",
+		"micromatch": "4.0.8",
+		"nanoid": "3.3.18",
+		"postcss": "8.5.26",
+		"svgo": "3.3.4",
+		"websocket-driver": "0.7.5",
+		"yaml": "1.10.3"
+	},
 	"scripts": {
 		"preinstall": "npx -y only-allow bun",
 		"lint": "bun run --filter './packages/www' lint && bun run --filter './packages/wp' lint",
