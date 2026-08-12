@@ -8,11 +8,7 @@
 	"ui": "dist/index.html",
 	"documentAccess": "dynamic-page",
 	"networkAccess": {
-		"allowedDomains": [
-			"https://us-central1-core-framework-6bdc9.cloudfunctions.net",
-			"https://alpha.coreframework.com",
-			"*"
-		],
-		"reasoning": "The plugin can be used to sync project from local wordpress instance or from production wordpress instance."
+		"allowedDomains": ["*"],
+		"reasoning": "The bundled editor can optionally connect to a WordPress origin supplied by the user and load public Google Fonts selected by the user."
 	}
 }

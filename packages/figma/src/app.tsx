@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import bg from "../public/bg.jpg";
 import "./app.scss";
 import { getColorVariables } from "./colors/getColorVariables";
-import { DEFAULT_PROJECT_ID, SelectProjectSection } from "./components/SelectProjectSection";
+import { SelectProjectSection } from "./components/SelectProjectSection";
 import { getSimpleVariable } from "./functions/getSimpleVariable";
 import { getVariables } from "./functions/getVariables";
 import { processFluidDeclarations } from "./functions/processFluidDeclarations";
@@ -12,7 +12,7 @@ import "./style.scss";
 import { ColorVariable, Declaration, Preset, SimpleVariable } from "./types";
 import { generateFluidTypographyObjects } from "./typography/getFluidTypeVariables";
 import { footerLinks } from "./utils/footer";
-import { postMessageToIframe, postMessageToParent } from "./utils/frameMessaging";
+import { isMessageFromEditor, postMessageToIframe, postMessageToParent } from "./utils/frameMessaging";
 
 // Sync variables to Figma - must be outside component to avoid stale closures
 function syncVariables(presetData: Preset, colorVariables: ColorVariable[]) {
@@ -112,7 +112,12 @@ function App() {
 	const [showIframe, setShowIframe] = useState<boolean | null>(false);
 
 	useEffect(() => {
-		window.addEventListener("message", (event) => {
+		const handleMessage = (event: MessageEvent) => {
+			// Raw messages belong to the bundled editor iframe. Figma host messages
+			// arrive wrapped in event.data.pluginMessage.
+			if (event.data?.type && !isMessageFromEditor(event)) return;
+			if (event.data?.pluginMessage && event.source !== parent) return;
+
 			if (event.data.type === "figma-reopen") {
 				setPreset(null);
 				setShowIframe(false);
@@ -132,25 +137,9 @@ function App() {
 			}
 
 			if (event.data.type === "update-project") {
-				try {
-					const apiKey = event.data.apiKey;
-					const isWebProject = apiKey.length === DEFAULT_PROJECT_ID.length;
-					const isWebSyncKey = apiKey.startsWith("cfweb:");
-
-					if (!isWebProject && !isWebSyncKey) {
-						const [pass, url] = [apiKey.slice(0, 24), decodeURIComponent(apiKey.slice(24))];
-						postMessageToParent({
-							type: "import-project-from-plugin-api",
-							apiKey,
-							pass,
-							url: url.replace("http://", "https://"),
-						});
-					} else {
-						postMessageToIframe("cf-figma-set-api-key", { apiKey: isWebProject ? "" : apiKey });
-						postMessageToParent({ type: "import-project", apiKey: apiKey || DEFAULT_PROJECT_ID });
-					}
-				} catch (e) {
-					console.log(e);
+				const apiKey = typeof event.data.apiKey === "string" ? event.data.apiKey.trim() : "";
+				if (apiKey) {
+					postMessageToParent({ type: "import-project-from-plugin-api", apiKey });
 				}
 			}
 
@@ -164,6 +153,9 @@ function App() {
 			if (pluginMessage?.type === "import-project") {
 				const importedPreset = pluginMessage?.preset as Preset | undefined;
 				if (importedPreset) {
+					if (pluginMessage?.projectId) {
+						postMessageToIframe("cf-figma-set-api-key", { apiKey: pluginMessage.projectId });
+					}
 					setPreset(importedPreset);
 					setShowIframe(true);
 					postMessageToIframe("cf-figma-load-preset", { preset: JSON.stringify(importedPreset) });
@@ -196,7 +188,10 @@ function App() {
 					syncVariables(payload.preset, payload.colorVariables);
 				}
 			}
-		});
+		};
+
+		window.addEventListener("message", handleMessage);
+		return () => window.removeEventListener("message", handleMessage);
 	}, []);
 
 	return (

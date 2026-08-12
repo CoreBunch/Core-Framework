@@ -1,18 +1,31 @@
 import { SimpleVariable } from "../src/types";
 
-const G_CLOUD_FUNCTION_BASE = "https://us-central1-core-framework-6bdc9.cloudfunctions.net";
-const WEB_SYNC_PREFIX = "cfweb:";
-
 const PRESET_API_KEY_STORAGE_KEY = "cf_plugin_project_api_key";
 const PRESET_LOCAL_STORAGE_KEY = "cf_plugin_project_local";
 
-async function fetchPreset(url: string, apiKey: string) {
-	const endpoint = new URL("/wp-json/core-framework/v2/preset", new URL(url).origin);
+function parseWordPressConnectionKey(connectionKey: string) {
+	if (connectionKey.length <= 24) return null;
+
+	try {
+		const siteUrl = new URL(decodeURIComponent(connectionKey.slice(24)));
+		if (!["https:", "http:"].includes(siteUrl.protocol)) return null;
+
+		return { connectionKey, siteUrl: siteUrl.origin };
+	} catch {
+		return null;
+	}
+}
+
+async function fetchPreset(connectionKey: string) {
+	const connection = parseWordPressConnectionKey(connectionKey);
+	if (!connection) throw new Error("Invalid WordPress connection key");
+
+	const endpoint = new URL("/wp-json/core-framework/v2/preset", connection.siteUrl);
 	const response = await fetch(endpoint.toString(), {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
-			"X-Core-Framework-Key": apiKey,
+			"X-Core-Framework-Key": connectionKey,
 		},
 	});
 
@@ -33,12 +46,26 @@ const ALLOWED_WORDPRESS_PATHS = new Set([
 	"/wp-json/core-framework/v2/figma/save-oxygen-css-helper",
 ]);
 
-function getWordPressConnection() {
-	const connectionKey = figma.root.getPluginData(PRESET_API_KEY_STORAGE_KEY);
-	if (!connectionKey || connectionKey.startsWith(WEB_SYNC_PREFIX) || connectionKey.length === 26) return null;
+async function getStoredConnectionKey() {
+	const storedKey = await figma.clientStorage.getAsync(PRESET_API_KEY_STORAGE_KEY);
+	if (typeof storedKey === "string" && parseWordPressConnectionKey(storedKey)) return storedKey;
 
-	const siteUrl = decodeURIComponent(connectionKey.slice(24));
-	return { connectionKey, siteUrl };
+	// Migrate connection keys saved by older plugin versions in the Figma document.
+	const legacyKey = figma.root.getPluginData(PRESET_API_KEY_STORAGE_KEY);
+	if (!legacyKey) return "";
+
+	figma.root.setPluginData(PRESET_API_KEY_STORAGE_KEY, "");
+	if (!parseWordPressConnectionKey(legacyKey)) return "";
+
+	await figma.clientStorage.setAsync(PRESET_API_KEY_STORAGE_KEY, legacyKey);
+	return legacyKey;
+}
+
+async function getWordPressConnection() {
+	const connectionKey = await getStoredConnectionKey();
+	if (!connectionKey) return null;
+
+	return parseWordPressConnectionKey(connectionKey);
 }
 
 async function handleWordPressRequest(msg: {
@@ -48,7 +75,7 @@ async function handleWordPressRequest(msg: {
 	body?: string;
 }) {
 	try {
-		const connection = getWordPressConnection();
+		const connection = await getWordPressConnection();
 		const target = new URL(msg.url);
 		const connectedSite = connection ? new URL(connection.siteUrl) : null;
 
@@ -99,17 +126,13 @@ figma.showUI(__html__, {
 
 figma.ui.onmessage = async (msg) => {
 	switch (msg.type) {
-		case "import-project": {
-			const { apiKey } = msg;
-			await importProject(apiKey);
-			break;
-		}
 		case "get-project-id": {
-			const projectId = figma.root.getPluginData(PRESET_API_KEY_STORAGE_KEY);
+			const projectId = await getStoredConnectionKey();
 			figma.ui.postMessage({ type: "get-project-id", projectId });
 			break;
 		}
 		case "delete-project-id": {
+			await figma.clientStorage.deleteAsync(PRESET_API_KEY_STORAGE_KEY);
 			figma.root.setPluginData(PRESET_API_KEY_STORAGE_KEY, "");
 			break;
 		}
@@ -180,69 +203,44 @@ figma.ui.onmessage = async (msg) => {
 		}
 		case "import-project-from-plugin-api": {
 			try {
-				const { apiKey, url } = msg;
-				const resJson = await fetchPreset(url, apiKey);
+				const { apiKey } = msg;
+				const resJson = await fetchPreset(apiKey);
 
 				if (resJson?.success && resJson?.data) {
-					figma.ui.postMessage({ type: "import-project", preset: resJson?.data });
-					figma.root.setPluginData(PRESET_API_KEY_STORAGE_KEY, apiKey);
+					figma.ui.postMessage({ type: "import-project", preset: resJson?.data, projectId: apiKey });
+					await figma.clientStorage.setAsync(PRESET_API_KEY_STORAGE_KEY, apiKey);
 					return;
 				}
 
 				figma.ui.postMessage({ type: "import-project-error", error: "Failed to import project" });
 			} catch (e) {
 				console.error(e);
-				figma.ui.postMessage({ type: "import-project-error", error: e });
+				figma.ui.postMessage({
+					type: "import-project-error",
+					error: e instanceof Error ? e.message : "Failed to import project",
+				});
 			}
 			break;
 		}
 		case "save-project-locally": {
-			const { payload: preset } = msg;
-			figma.root.setPluginData(PRESET_LOCAL_STORAGE_KEY, JSON.stringify(preset));
+			const preset = msg.payload?.preset;
+			if (preset) {
+				figma.root.setPluginData(PRESET_LOCAL_STORAGE_KEY, JSON.stringify(preset));
+			}
 			break;
 		}
 		case "get-project-locally": {
-			const preset = figma.root.getPluginData(PRESET_LOCAL_STORAGE_KEY);
-			figma.ui.postMessage({ type: "get-project-locally", preset: JSON.parse(preset) });
+			const serializedPreset = figma.root.getPluginData(PRESET_LOCAL_STORAGE_KEY);
+			let preset = null;
+			if (serializedPreset) {
+				try {
+					preset = JSON.parse(serializedPreset);
+				} catch (error) {
+					console.warn("Failed to read the local Core Framework project", error);
+				}
+			}
+			figma.ui.postMessage({ type: "get-project-locally", preset });
 			break;
 		}
 	}
 };
-
-function parseWebSyncKey(connectionKey: string) {
-	if (!connectionKey.startsWith(WEB_SYNC_PREFIX)) return null;
-
-	const [, presetId, token] = connectionKey.split(":");
-	if (!presetId || !token) return null;
-
-	return { presetId, token };
-}
-
-async function importProject(connectionKey: string) {
-	try {
-		const webSync = parseWebSyncKey(connectionKey);
-		const endpoint = webSync
-			? `${G_CLOUD_FUNCTION_BASE}/figmaPreset?presetId=${webSync.presetId}`
-			: `${G_CLOUD_FUNCTION_BASE}/getPreset?id=${connectionKey}`;
-		const response = await fetch(endpoint, {
-			method: "GET",
-			headers: webSync ? { Authorization: `Bearer ${webSync.token}` } : undefined,
-		});
-
-		const json = await response.json();
-
-		if (!json?.success) {
-			figma.ui.postMessage({ type: "import-project-error", error: json?.error });
-			return;
-		}
-
-		const data = webSync ? json.preset : json.data;
-		const preset = JSON.parse(data.json);
-
-		figma.ui.postMessage({ type: "import-project", preset });
-		figma.root.setPluginData(PRESET_API_KEY_STORAGE_KEY, connectionKey);
-	} catch (e) {
-		console.error(e);
-		figma.ui.postMessage({ type: "import-project-error", error: e });
-	}
-}
