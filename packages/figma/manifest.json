@@ -1,0 +1,18 @@
+{
+	"name": "Core Framework",
+	"id": "1425159447572460002",
+	"api": "1.0.0",
+	"editorType": ["figma"],
+	"permissions": [],
+	"main": "dist/code.js",
+	"ui": "dist/index.html",
+	"documentAccess": "dynamic-page",
+	"networkAccess": {
+		"allowedDomains": [
+			"https://us-central1-core-framework-6bdc9.cloudfunctions.net",
+			"https://alpha.coreframework.com",
+			"*"
+		],
+		"reasoning": "The plugin can be used to sync project from local wordpress instance or from production wordpress instance."
+	}
+}

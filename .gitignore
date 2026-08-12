@@ -1,0 +1,57 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+vite.config.js.timestamp-*
+.dccache
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+thunder-tests
+
+# jest
+coverage
+
+# core frontend css 
+packages/wp/assets/public/css/core_framework.css
+packages/wp/assets/public/css/editor_prefixed_core_framework.css
+
+# Local Netlify folder
+.netlify
+
+
+# envriotmental variables
+.env
+
+# php 
+vendor
+composer.lock
+!packages/wp/composer.lock
+
+# Release staging
+.tmp/
+
+# vercel
+.vercel
+
+# Claude-related files
+CLAUDE.sessions.md
+.claude/
+sessions/

@@ -1,0 +1,46 @@
+name: Feature request
+description: Suggest a capability or improvement for Core Framework.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What workflow is blocked or awkward today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the smallest useful version of the change.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Include any workaround or different design worth considering.
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Colors and design tokens
+        - Typography and spacing
+        - Components and layouts
+        - Project management
+        - Web app
+        - WordPress
+        - Figma
+        - Gutenberg
+        - Bricks
+        - Oxygen
+        - Documentation
+        - Other
+    validations:
+      required: false

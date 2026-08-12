@@ -1,0 +1,41 @@
+.cf-theme-toggle-button {
+	border: none;
+	outline: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0);
+	border-radius: 999px;
+	width: 30px;
+	aspect-ratio: 1;
+	cursor: pointer;
+	padding: unset;
+}
+.cf-theme-toggle-button:hover,
+.cf-theme-toggle-button:focus {
+	background: unset;
+}
+.cf-theme-toggle-button svg {
+	width: 24px;
+	height: 24px;
+}
+.cf-theme-toggle-button.cf-theme-dark .cf-theme-icon.cf-light-mode-icon {
+	display: none;
+}
+.cf-theme-toggle-button.cf-theme-dark .cf-theme-icon.cf-dark-mode-icon {
+	display: block;
+}
+.cf-theme-toggle-button.cf-theme-light .cf-theme-icon.cf-light-mode-icon {
+	display: block;
+}
+.cf-theme-toggle-button.cf-theme-light .cf-theme-icon.cf-dark-mode-icon {
+	display: none;
+}
+.cf-theme-toggle-button svg.cf-light-mode-icon {
+	color: white;
+}
+.cf-theme-toggle-button svg.cf-dark-mode-icon {
+	color: black;
+}

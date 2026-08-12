@@ -1,0 +1,180 @@
+:root {
+	--wp-components-color-destructive: #cc1818;
+}
+
+@function rem-to-px($remValue, $baseFontSize: 10px) {
+	@return $remValue * $baseFontSize;
+}
+
+.coreframework-panel {
+	.components-base-control__error {
+		color: var(--wp--preset--color--vivid-red);
+	}
+	.components-tab-panel__tabs.disabled {
+		opacity: 0.5;
+	}
+
+	.components-search-control {
+		margin-bottom: unset !important;
+	}
+
+	.coreframework-color-preview {
+		width: rem-to-px(1);
+		aspect-ratio: 1;
+		border-radius: 50%;
+		margin-right: rem-to-px(0.5);
+		flex-shrink: 0;
+		display: inline-block;
+	}
+
+	.disable {
+		opacity: 0.25;
+		pointer-events: none;
+	}
+
+	.disable .components-button.is-active:after {
+		height: 0;
+	}
+
+	.coreframework-utility-classes {
+		display: block !important;
+
+		.components-panel__row {
+			margin: 0 -15px;
+		}
+	}
+
+	.coreframework-active-classes,
+	.coreframework-search-results,
+	.coreframework-active-other-classes,
+	.coreframework-utility-classes .components-panel__row {
+		display: flex;
+		flex-wrap: wrap;
+		max-height: 300px;
+		overflow: auto;
+	}
+
+	.coreframework-active-classes .coreframework-class,
+	.coreframework-active-other-classes .coreframework-class {
+		width: auto;
+	}
+
+	.coreframework-search-results h3 {
+		width: 100%;
+		margin-top: 1em;
+	}
+
+	.coreframework-class {
+		padding: rem-to-px(0.5) rem-to-px(0.75);
+		border-color: transparent;
+		background: hsl(0deg 0% 0% / 5%);
+		text-align: left;
+		cursor: pointer;
+		width: 100%;
+		border-radius: 5px;
+		box-shadow: inset -1px 0 0 1px white;
+		border: 0;
+
+		&.is-selected {
+			background: hsla(200, 100%, 36.5%, 0.5);
+			color: #fff;
+		}
+
+		&.is-active,
+		&.is-destructive {
+			background: var(--wp-admin-theme-color);
+			color: #fff;
+		}
+		&.is-destructive:hover {
+			background: var(--wp-components-color-destructive);
+		}
+	}
+
+	.coreframework-active-other-classes-heading {
+		margin-top: 1.5em;
+	}
+}
+
+.cf-theme-toggle-button {
+	align-items: center;
+	aspect-ratio: 1;
+	background: transparent;
+	border: none;
+	border-radius: 999px;
+	cursor: pointer;
+	display: flex;
+	height: 100%;
+	justify-content: center;
+	outline: none;
+	padding: unset;
+	width: 100%;
+	width: 30px;
+}
+
+.cf-theme-toggle-button:focus,
+.cf-theme-toggle-button:hover {
+	background: unset;
+}
+
+.cf-theme-toggle-button svg {
+	height: 24px;
+	width: 24px;
+}
+
+.cf-theme-toggle-button.cf-theme-dark .cf-theme-icon.cf-light-mode-icon {
+	display: none;
+}
+
+.cf-theme-toggle-button.cf-theme-dark .cf-theme-icon.cf-dark-mode-icon,
+.cf-theme-toggle-button.cf-theme-light .cf-theme-icon.cf-light-mode-icon {
+	display: block;
+}
+
+.cf-theme-toggle-button.cf-theme-light .cf-theme-icon.cf-dark-mode-icon {
+	display: none;
+}
+
+.cf-theme-toggle-button svg.cf-light-mode-icon {
+	color: #fff;
+}
+
+.cf-theme-toggle-button svg.cf-dark-mode-icon {
+	color: #000;
+}
+
+html.cf-theme-dark .cf-theme-toggle-button .cf-dark-mode-icon {
+	display: block;
+}
+
+html.cf-theme-dark .cf-theme-toggle-button .cf-light-mode-icon {
+	display: none;
+}
+
+html.cf-theme-light .cf-theme-toggle-button .cf-dark-mode-icon {
+	display: none;
+}
+
+html.cf-theme-light .cf-theme-toggle-button .cf-light-mode-icon {
+	display: block;
+}
+
+html:not(.cf-theme-dark):not(.cf-theme-light) .cf-theme-toggle-button .cf-dark-mode-icon {
+	display: none;
+}
+
+/**
+ * Corrected layout when "Show button text labels" option is enabled.
+ */
+.show-icon-labels {
+	.coreframework-utility-classes {
+		.components-tab-panel__tabs {
+			.components-button.has-icon {
+				text-align: left;
+			}
+
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			border-bottom: 2px solid var(--wp-components-color-foreground, #1e1e1e);
+		}
+	}
+}

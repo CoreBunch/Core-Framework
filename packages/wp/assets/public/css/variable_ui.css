@@ -1,0 +1,422 @@
+cf-variable-ui.is-bricks {
+	--cf-ui--bg: var(--builder-bg);
+	--cf-ui--surface: var(--builder-bg-2);
+	--cf-ui--surface-2: var(--builder-bg-3);
+	--cf-ui--text: var(--builder-color);
+}
+
+cf-variable-ui.is-oxygen {
+	--cf-ui--bg: var(--oxy-dark);
+	--cf-ui--surface: var(--oxy-mid);
+	--cf-ui--surface-2: rgba(255, 255, 255, 0.15);
+	--cf-ui--text: white;
+}
+
+.cf-variable-ui-hint {
+	height: 100%;
+	margin-left: 3.5px;
+}
+
+.cf-variable-ui-hint svg {
+	width: 14px;
+	height: 14px;
+}
+
+html body #bricks-panel-element button.cf-variable-ui-trigger {
+	appearance: none;
+	box-shadow: none;
+	border: none;
+	outline: unset;
+	appearance: none;
+	max-width: 100%;
+	background-color: transparent;
+	color: white;
+	padding: 1px;
+	font-size: 11px;
+	cursor: pointer;
+	display: grid;
+	place-content: center;
+	transition: all 0.2s;
+	position: absolute;
+	right: 3px;
+	top: 0;
+	width: 15px;
+	height: 15px;
+	z-index: 1000;
+}
+
+html body #bricks-panel-element .color-input button.cf-variable-ui-trigger {
+	right: 26px;
+}
+
+.oxygen-builder-body button.cf-variable-ui-trigger {
+	appearance: none;
+	box-shadow: none;
+	border: none;
+	outline: unset;
+	appearance: none;
+	max-width: 100%;
+	background-color: transparent;
+	color: red;
+	padding: 5px;
+	font-size: 11px;
+	cursor: pointer;
+	display: grid;
+	place-content: center;
+	transition: all 0.2s;
+}
+
+.cf-variable-ui-trigger img {
+	filter: grayscale(100%);
+	width: 12px;
+}
+.cf-variable-ui-trigger:hover img {
+	filter: grayscale(0%);
+}
+
+cf-variable-ui {
+	background-color: var(--cf-ui--bg);
+	border-radius: 7.5px;
+	box-shadow: 0 0.25rem 3rem hsla(0, 0%, 0%, 0.5);
+	max-width: 100%;
+}
+
+cf-variable-ui .cf-variable-ui-scroll-container {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	max-height: 90%;
+	height: calc(100% - 50px);
+	width: 100%;
+	max-height: 100%;
+}
+
+cf-variable-ui .cf-variable-ui-scroll-container::-webkit-scrollbar {
+	width: 0.35rem;
+	height: 0.35rem;
+}
+
+cf-variable-ui .cf-variable-ui-scroll-container::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+cf-variable-ui .cf-variable-ui-scroll-container::-webkit-scrollbar-thumb {
+	background: #ffffff3d;
+	transition: all 0.2s;
+	border-radius: 0.125rem;
+}
+
+cf-variable-ui #cf-variable-ui-header {
+	padding: 0 12px;
+	height: 50px;
+	z-index: 999999;
+	display: flex;
+	align-items: center;
+	background: var(--cf-ui--surface);
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+	cursor: grab;
+}
+
+cf-variable-ui #cf-variable-ui-header .cf-variable-ui-open-core-framework {
+	appearance: none;
+	box-shadow: none;
+	border: none;
+	outline: unset;
+	appearance: none;
+	max-width: 100%;
+	background-color: transparent;
+	color: var(--cf-ui--text);
+	text-decoration: none;
+	background: var(--cf-ui--surface-2);
+	border-radius: 4px;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 5px;
+	margin-left: 15px;
+}
+
+cf-variable-ui #cf-variable-ui-header .cf-variable-ui-open-core-framework:hover {
+	background: var(--cf-ui--bg);
+}
+
+cf-variable-ui #cf-variable-ui-header .cf-variable-ui-close-button {
+	appearance: none;
+	box-shadow: none;
+	border: none;
+	outline: unset;
+	appearance: none;
+	max-width: 100%;
+	background-color: transparent;
+	color: var(--cf-ui--text);
+	font-size: 0px;
+	cursor: pointer;
+	margin-left: auto;
+	padding: 5px;
+}
+
+cf-variable-ui #cf-variable-ui-header .cf-variable-ui-close-button > svg {
+	width: 15px;
+	height: 15px;
+}
+
+cf-variable-ui .cf-variable-ui-group-title {
+	padding: 10px;
+	font-weight: bold;
+	color: white;
+}
+
+cf-variable-ui .cf-variable-ui-row-title {
+	padding: 12px;
+	padding-bottom: 0px;
+	font-weight: 400;
+	font-size: 12px;
+	color: var(--cf-ui--text);
+	opacity: 0.6;
+	display: flex;
+}
+
+cf-variable-ui .cf-variable-ui-list {
+	padding: 10px;
+	list-style: none;
+	margin: 0;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	gap: 5px;
+}
+
+cf-variable-ui .cf-variable-ui-list-item {
+	margin: 0;
+	appearance: none;
+	border-radius: 5px;
+	box-shadow: none;
+	border: none;
+	outline: unset;
+	appearance: none;
+	max-width: 100%;
+	color: var(--cf-ui--text);
+	background: var(--cf-ui--surface);
+	transition: all 0.16s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 5px 10px;
+	font-family: monospace;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+cf-variable-ui .cf-variable-ui-list-item:hover {
+	background-color: #717cfb;
+}
+
+cf-variable-ui .cf-variable-ui-list-item span {
+	display: inline-block;
+	margin-right: 5px;
+	border-radius: 999px;
+	width: 15px;
+	height: 15px;
+}
+
+cf-variable-ui .cf-variable-ui-container {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+	gap: 5px;
+	padding: 10px;
+}
+
+cf-variable-ui .cf-variable-ui-category-title {
+	padding: 0 12px;
+	height: 40px;
+	font-weight: 500;
+	font-size: 14px;
+	margin: 8px;
+	border-radius: 8px;
+	color: var(--cf-ui--text);
+	text-transform: capitalize;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	user-select: none;
+	cursor: pointer;
+	background: var(--cf-ui--surface);
+}
+
+cf-variable-ui .cf-variable-ui-category-title:hover {
+	background: var(--cf-ui--surface-2);
+}
+
+cf-variable-ui .cf-variable-ui-color-wrapper-second {
+	margin: 8px;
+	padding-inline: 6px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid rgb(255 255 255 / 10%);
+}
+
+cf-variable-ui .cf-variable-ui-shades-wrapper,
+cf-variable-ui .cf-variable-ui-tints-wrapper,
+cf-variable-ui .cf-variable-ui-transparent-wrapper {
+	display: flex;
+	flex-wrap: nowrap;
+	max-width: 100%;
+	cursor: pointer;
+}
+
+cf-variable-ui .cf-variable-ui-shades-wrapper > button:first-child,
+cf-variable-ui .cf-variable-ui-tints-wrapper > button:first-child {
+	border-radius: 5px 0 0 5px;
+}
+
+cf-variable-ui .cf-variable-ui-shades-wrapper > button:last-child,
+cf-variable-ui .cf-variable-ui-tints-wrapper > button:last-child {
+	border-radius: 0 5px 5px 0;
+}
+
+cf-variable-ui .cf-variable-ui-transparent-wrapper > button:last-child > div {
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+cf-variable-ui .cf-variable-ui-transparent-wrapper > button:first-child > div {
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+
+cf-variable-ui .cf-variable-ui-list-item-color {
+	box-shadow: none;
+	border: none;
+	outline: unset;
+	appearance: none;
+	width: 100%;
+	height: 25px;
+	flex: 1;
+	flex-shrink: 1;
+	cursor: pointer;
+}
+
+cf-variable-ui .cf-variable-ui-list-item-color,
+cf-variable-ui .cf-variable-ui-list-item-color > div {
+	background-color: var(--cf-variable-ui-color);
+}
+
+html.cf-theme-dark cf-variable-ui .cf-variable-ui-list-item-color,
+html.cf-theme-dark cf-variable-ui .cf-variable-ui-list-item-color > div {
+	background-color: var(--cf-variable-ui-color-dark, var(--cf-variable-ui-color));
+}
+
+cf-variable-ui .cf-variable-ui-color-wrapper-second > .cf-variable-ui-list-item-color {
+	border-radius: 5px;
+}
+
+cf-variable-ui .cf-variable-ui-color-title {
+	font-weight: 400;
+	font-size: 10px;
+	color: var(--cf-ui--text);
+	margin-bottom: 5px;
+	margin-top: 10px;
+}
+
+[data-cftooltip] {
+	position: relative;
+}
+
+[data-cftooltip]::after {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+	content: attr(data-cftooltip);
+	left: 50%;
+	top: calc(-100% - 20px);
+	border-radius: 3px;
+	box-shadow: 0 0 5px 2px rgb(0 0 0 / 50%);
+	background-color: #717cfb;
+	color: white;
+	z-index: 10;
+	padding: 8px;
+	width: max-content;
+	white-space: nowrap;
+	transform: translateY(-5px) translateX(-50%);
+	transition: all 120ms cubic-bezier(0.25, 0.8, 0.25, 1);
+	font-family: monospace;
+	font-size: 12px;
+}
+
+[data-cftooltip]:hover::after {
+	opacity: 1;
+	transform: translateY(0) translateX(-50%);
+	transition-duration: 300ms;
+	z-index: 9999999999999;
+}
+
+[data-cftooltip-position="right"]::after {
+	left: 100%;
+	top: 50%;
+	max-width: 200px;
+	white-space: normal;
+	transform: translateX(5px) translateY(-50%);
+}
+
+[data-cftooltip-position="right"]::after:hover {
+	transform: translateX(5px) translateY(-50%);
+}
+
+.cf-variable-ui-transparent-wrapper > button:first-child[data-cftooltip]::after,
+.cf-variable-ui-tints-wrapper > button:first-child[data-cftooltip]::after,
+.cf-variable-ui-shades-wrapper > button:first-child[data-cftooltip]::after {
+	left: 0;
+	right: unset;
+	transform: translateX(0) translateY(0);
+}
+
+.cf-variable-ui-transparent-wrapper > button:last-child[data-cftooltip]::after,
+.cf-variable-ui-tints-wrapper > button:last-child[data-cftooltip]::after,
+.cf-variable-ui-shades-wrapper > button:last-child[data-cftooltip]::after {
+	right: 0;
+	left: unset;
+	transform: translateX(0) translateY(0);
+}
+
+cf-variable-ui .cf-variable-ui-section-toggle {
+	all: unset;
+}
+
+cf-variable-ui .cf-variable-ui-section-toggle::after {
+	margin-left: 5px;
+	content: "\25BC";
+	transform: rotate(0deg);
+	transition: transform 0.2s ease;
+	display: inline-block;
+	cursor: pointer;
+}
+
+cf-variable-ui .cf-variable-ui-wrapper[data-group-expand="true"] .cf-variable-ui-category-title {
+	background: var(--cf-ui--surface-2);
+}
+
+cf-variable-ui .cf-variable-ui-wrapper[data-group-expand="true"] .cf-variable-ui-section-toggle::after {
+	transform: rotate(180deg);
+}
+
+cf-variable-ui .cf-variable-ui-wrapper[data-group-expand="false"] .cf-variable-ui-section-toggle::after {
+	transform: rotate(0deg);
+}
+
+cf-variable-ui .cf-variable-ui-wrapper[data-group-expand="true"] .cf-variable-ui-group,
+cf-variable-ui .cf-variable-ui-wrapper[data-group-expand="true"] .cf-variable-ui-color-wrapper {
+	display: block;
+}
+
+cf-variable-ui .cf-variable-ui-wrapper[data-group-expand="false"] .cf-variable-ui-group,
+cf-variable-ui .cf-variable-ui-wrapper[data-group-expand="false"] .cf-variable-ui-color-wrapper {
+	display: none;
+}
+
+cf-variable-ui .cf-variable-ui-wrapper[data-hidden="false"] {
+	display: block;
+}
+
+cf-variable-ui .cf-variable-ui-wrapper[data-hidden="true"] {
+	display: none;
+}

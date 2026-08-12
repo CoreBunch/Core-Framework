@@ -1,0 +1,67 @@
+{
+	"name": "core-framework/core-framework",
+	"description": "Meet the new Core Framework, the cutting-edge CSS framework toolkit built to transform the way you design and develop websites.",
+	"minimum-stability": "stable",
+	"prefer-stable": true,
+	"type": "wordpress-plugin",
+	"license": "MIT",
+	"homepage": "https://coreframework.com/",
+	"support": {
+		"issues": "https://github.com/corebunch/core-framework/issues",
+		"source": "https://github.com/corebunch/core-framework"
+	},
+	"autoload": {
+		"psr-4": {
+			"CoreFramework\\": "wp/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"CoreFramework\\Tests\\": "Tests/"
+		}
+	},
+	"scripts": {
+		"mp": "./vendor/bin/phpcs -p ./wp --standard=./phpcs.ruleset.xml --extensions=php -d memory_limit=1024M",
+		"wp": "./vendor/bin/phpcs -p ./wp --standard=PHPCompatibilityWP --extensions=php -d memory_limit=1024M --runtime-set testVersion 8.0-",
+		"wpe": "phpcs -p ./wp --standard=WordPress-Extra --extensions=php -d memory_limit=1024M",
+		"psr12": "phpcs -p ./wp --standard=PSR12 --extensions=php -d memory_limit=1024M",
+		"cbfextra": "phpcbf -p ./wp --standard=WordPress-Extra --extensions=php -d memory_limit=2048M",
+		"rector:dry": "vendor/bin/rector process wp vendor/autoload.php *.php --dry-run",
+		"rector": "vendor/bin/rector process wp vendor/autoload.php *.php",
+		"rector:downgrade": "vendor/bin/rector process wp vendor/autoload.php *.php --config rector-downgrade.php"
+	},
+	"require": {
+		"php": ">=8.0",
+		"composer/installers": "^2.2",
+		"micropackage/requirements": "^1.2"
+	},
+	"require-dev": {
+		"php-stubs/wordpress-stubs": "^6.1",
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"rector/rector": "^0.15.21",
+		"wp-coding-standards/wpcs": "^3.0",
+		"phpunit/phpunit": "^9"
+	},
+	"keywords": [
+		"wordpress",
+		"plugin",
+		"framework"
+	],
+	"authors": [
+		{
+			"name": "Core Framework",
+			"email": "hello@coreframework.com",
+			"homepage": "https://coreframework.com"
+		}
+	],
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		},
+		"platform": {
+			"php": "8.0"
+		}
+	}
+}

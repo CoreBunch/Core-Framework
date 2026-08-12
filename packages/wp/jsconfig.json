@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"checkJs": false,
+		"resolveJsonModule": true,
+		"moduleResolution": "node",
+		"target": "esnext",
+		"module": "esnext",
+		"jsx": "react",
+		"baseUrl": "src",
+		"paths": {
+			"@/*": ["./*"],
+			"@Views/*": ["./views/*"],
+			"@Constants/*": ["./constants/*"]
+		}
+	},
+	"exclude": ["dist", "node_modules", "build", ".vscode", "coverage", ".npm", ".yarn"],
+	"typeAcquisition": {
+		"enable": true,
+		"include": ["react", "react-dom", "jest", "testing-library__jest-dom"]
+	}
+}

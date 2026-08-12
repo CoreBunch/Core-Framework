@@ -1,0 +1,47 @@
+/* CSS Mini Reset */
+
+html,
+body,
+div,
+form,
+fieldset,
+legend,
+label,
+ul {
+	margin: 0;
+	padding: 0;
+}
+div {
+	box-sizing: border-box;
+}
+
+img {
+	border: 0;
+}
+
+body {
+	font-family: var(--font-family);
+	font-weight: 400;
+	letter-spacing: 0.5px;
+	margin: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+button {
+	border: 0;
+	background: none;
+	outline: 0;
+	color: var(--btn-color-primary);
+	cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0;
+}

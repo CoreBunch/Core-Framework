@@ -1,0 +1,62 @@
+/* CSS Mini Reset */
+
+html,
+body,
+div,
+form,
+fieldset,
+legend,
+label,
+ul,
+li {
+	margin: 0;
+	padding: 0;
+}
+div {
+	box-sizing: border-box;
+}
+
+img {
+	border: 0;
+}
+
+#wpbody-content {
+	padding-bottom: 0 !important;
+}
+
+#wpcontent {
+	padding-left: 0;
+}
+
+#core-framework-init {
+	display: grid;
+	place-items: center;
+	padding: 4vh 5vw 4vh calc(5vw - 20px);
+	height: 100%;
+
+	&:has(.fullscreen-mode) {
+		padding: 0;
+		height: calc(100vh - 32px);
+	}
+}
+
+body {
+	overflow-y: hidden;
+}
+
+#core-framework-init button {
+	border: 0;
+	background: none;
+	outline: 0;
+	color: var(--btn-color-primary);
+	cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0;
+}

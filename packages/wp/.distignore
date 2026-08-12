@@ -1,0 +1,85 @@
+# Development and build files
+.git/
+.github/
+node_modules/
+src/
+Tests/
+scripts/
+types/
+bun.lock
+.npmrc
+.nvmrc
+.browserslistrc
+.hakkenrc
+.env.example
+
+# Composer dev dependencies
+vendor/composer/installed.json
+vendor/composer/installers/.github/
+vendor/micropackage/requirements/tests/
+vendor/micropackage/requirements/.git*
+vendor/micropackage/requirements/.editorconfig
+vendor/micropackage/requirements/.gitattributes
+vendor/micropackage/requirements/.gitignore
+vendor/micropackage/requirements/composer.*
+vendor/micropackage/requirements/README.md
+vendor/micropackage/internationalization/.editorconfig
+vendor/micropackage/internationalization/.gitattributes
+vendor/micropackage/internationalization/.gitignore
+
+# Configuration files
+.distignore
+.gitignore
+.gitattributes
+.env
+.editorconfig
+.prettierrc
+.prettierignore
+biome.json
+.htaccess
+.stylelintrc
+
+# Build configuration
+composer.json
+composer.lock
+package.json
+package-lock.json
+pnpm-lock.yaml
+bun.lockb
+tsconfig.json
+tsconfig.node.json
+vite.config.js
+vite.config.ts
+vite.config.js.timestamp-*
+webpack.config.js
+gulpfile.js
+postcss.config.js
+jsconfig.json
+
+# Code quality tools
+phpcs.xml
+phpcs.ruleset.xml
+phpcs-security.ruleset.xml
+rector.php
+rector-downgrade.php
+
+# Documentation
+README.md
+CONTRIBUTING.md
+CHANGELOG.md
+
+# WordPress.org assets (handled separately by the action)
+.wordpress-org/
+
+# Temporary and cache files
+*.log
+*.cache
+.DS_Store
+Thumbs.db
+
+# Exclude markdown and other docs
+*.md
+!readme.txt
+*.map
+*.sh
+

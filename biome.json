@@ -1,0 +1,44 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.7/schema.json",
+	"formatter": {
+		"enabled": false,
+		"indentStyle": "tab",
+		"lineWidth": 110
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"correctness": {
+				"recommended": false
+			},
+			"performance": {
+				"recommended": false,
+				"noDelete": "off"
+			},
+			"style": {
+				"recommended": false,
+				"useBlockStatements": "off",
+				"noImplicitBoolean": "off",
+				"noNonNullAssertion": "off"
+			},
+			"a11y": {
+				"recommended": false,
+				"useKeyWithClickEvents": "off",
+				"useButtonType": "off"
+			},
+			"security": {
+				"recommended": false,
+				"noDangerouslySetInnerHtml": "off"
+			},
+			"complexity": {
+				"recommended": false
+			},
+			"suspicious": {
+				"recommended": false
+			}
+		}
+	},
+	"assist": {
+		"enabled": false
+	}
+}

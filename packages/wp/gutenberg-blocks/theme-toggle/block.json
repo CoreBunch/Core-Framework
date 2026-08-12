@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "core-framework/theme-toggle",
+  "version": "2.0.0",
+  "title": "Theme Toggle",
+  "category": "core-framework",
+  "description": "Easily add toggle between dark and light mode. This feature requires use of the Core Framework classes and variables.",
+  "attributes": {
+    "icon_type": {
+      "type": "string",
+      "default": "filled"
+    },
+    "icon_size": {
+      "type": "number",
+      "default": 24
+    },
+    "dark_mode_color": {
+      "type": "string"
+    },
+    "light_mode_color": {
+      "type": "string"
+    },
+    "background_color": {
+      "type": "string",
+      "default": "transparent"
+    },
+    "button_padding": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "example": {
+    "attributes": {
+      "icon_type": "filled",
+      "icon_size": 24,
+      "dark_mode_color": "#000000",
+      "light_mode_color": "#ffffff",
+      "background_color": "transparent",
+      "button_padding": 0
+    }
+  },
+  "supports": {
+    "html": false
+  },
+  "textdomain": "theme-toggle",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css",
+  "viewScript": "core_framework_theme"
+}

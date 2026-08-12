@@ -1,0 +1,21 @@
+{
+	"name": "core-framework-builder-integrations",
+	"private": true,
+	"description": "Bricks and Oxygen builder integrations for Core Framework.",
+	"author": "David Babinec",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/corebunch/core-framework.git",
+		"directory": "packages/builder-integrations"
+	},
+	"prettier": "../../.prettierrc.cjs",
+	"scripts": {
+		"dev": "tsc -w",
+		"build": "node build.mjs"
+	},
+	"devDependencies": {
+		"esbuild": "^0.28.1",
+		"typescript": "^5.9.3"
+	}
+}

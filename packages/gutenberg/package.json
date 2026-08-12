@@ -1,0 +1,38 @@
+{
+	"name": "coreframework-gutenberg-integration",
+	"version": "2.0.0",
+	"description": "Gutenberg editor integration for Core Framework.",
+	"author": "David Babinec",
+	"main": "index.js",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/corebunch/core-framework.git",
+		"directory": "packages/gutenberg"
+	},
+	"prettier": "../../.prettierrc.cjs",
+	"devDependencies": {
+		"@wordpress/block-editor": "^16.1.0",
+		"@wordpress/components": "^38.0.0",
+		"@wordpress/compose": "^8.5.0",
+		"@wordpress/data": "^10.52.0",
+		"@wordpress/element": "^8.4.0",
+		"@wordpress/plugins": "^7.52.0",
+		"@wordpress/scripts": "^34.0.0",
+		"autoprefixer": "^10.5.4",
+		"glob": "^13.0.6",
+		"postcss": "^8.5.26"
+	},
+	"scripts": {
+		"build": "wp-scripts build",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"format": "wp-scripts format",
+		"start": "wp-scripts start --hot",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"files": [
+		"build/**.*",
+		"*.php",
+		"*.js"
+	]
+}

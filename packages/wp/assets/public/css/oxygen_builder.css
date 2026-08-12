@@ -1,0 +1,61 @@
+.cf-variable-dropdown {
+	position: absolute;
+	top: calc(100% + 1px);
+	left: 0;
+	z-index: 99999999;
+	background-color: var(--oxy-mid);
+	max-width: 100%;
+	width: 100%;
+	min-width: 200px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding: 0;
+	height: max-content !important;
+	max-height: 200px;
+	box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+}
+
+.cf-variable-dropdown::-webkit-scrollbar {
+	display: none;
+}
+
+.cf-variable-dropdown ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	border: 1px solid hsla(0, 0%, 100%, 0.1);
+}
+
+.cf-variable-dropdown ul li {
+	cursor: pointer;
+	line-height: 20px;
+	margin: 1px 0;
+	padding: 4px 10px;
+	color: white;
+	border-bottom: 1px solid hsla(0, 0%, 100%, 0.1);
+	font-size: var(--oxy-small-text-size);
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+}
+
+.oxygen-margin-controls .cf-variable-dropdown,
+.oxygen-control-row .oxygen-control-wrapper:not(:first-child) .cf-variable-dropdown {
+	left: unset;
+	right: 0;
+}
+
+.cf-variable-dropdown ul li:hover,
+.cf-variable-dropdown ul li.selected {
+	background-color: hsla(0, 0%, 100%, 0.1);
+}
+
+.cf-variable-dropdown ul li span {
+	border-radius: 999px;
+	width: 15px;
+	height: 15px;
+	display: inline-block;
+	margin-right: 7.5px;
+	margin-top: auto;
+	margin-bottom: auto;
+}

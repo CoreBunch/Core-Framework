@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"target": "ES2019",
+		"jsx": "react-jsx",
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"moduleResolution": "node",
+		"allowSyntheticDefaultImports": true,
+		"strict": true
+	},
+	"include": ["src"],
+	"exclude": ["assets/js", "build", "node_modules", "vendor"]
+}

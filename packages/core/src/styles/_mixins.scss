@@ -1,0 +1,307 @@
+/* INPUTS */
+
+@mixin input-style {
+	font-family: var(--font-family);
+	margin: 0;
+	line-height: 1;
+	box-shadow: none;
+	outline: 0;
+	border: 0.125rem solid var(--border-sec);
+	border-radius: var(--radius-btn);
+
+	background: var(--bg-overlay-1);
+
+	font-size: var(--text-s);
+	font-weight: 500;
+	letter-spacing: 0.01rem;
+	color: var(--color-main);
+	padding: var(--space-xs);
+	min-width: 0;
+	max-width: 100%;
+	height: auto;
+	transition: border-color 0.3s;
+	box-sizing: border-box;
+
+	&:hover {
+		border-color: var(--border-main);
+	}
+
+	&:hover {
+		border-color: var(--border-main);
+	}
+
+	&:focus {
+		border-color: var(--primary);
+	}
+}
+
+@mixin dropdown-style {
+	background-color: var(--bg-dropdown);
+	border: 0;
+	border-radius: 0.5rem;
+	box-shadow: var(--shadow-dropdown);
+	z-index: 999;
+}
+@mixin dropdown-item {
+	color: var(--color-main);
+	font-weight: 500;
+	font-size: var(--text-s);
+	padding: var(--space-xs) var(--space-s);
+	border-radius: 0.5rem;
+	background: transparent;
+	transition: background 0.3s;
+	border-top: 0;
+
+	svg {
+		width: 1.125rem;
+		height: 1.125rem;
+		opacity: 0.75;
+	}
+
+	&:hover {
+		background: var(--bg-overlay-1);
+	}
+}
+
+@mixin dropdown-scrollbar {
+	&::-webkit-scrollbar {
+		width: 0.35rem;
+		height: 0.35rem;
+	}
+
+	&::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: var(--scrollbar);
+		transition: all 0.2s;
+		border-radius: 0.125rem;
+
+		&:hover {
+			background: var(--scrollbar-hover);
+		}
+	}
+}
+
+@mixin btn-style-common {
+	margin: 0;
+	border: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+	gap: var(--space-3xs);
+	border-radius: var(--radius-btn);
+	transition: all 0.3s;
+
+	&:hover {
+		background-position: 100% 100%;
+	}
+
+	&:focus {
+		box-shadow: 0px 0px 0px 0.125rem var(--primary);
+	}
+
+	svg {
+		color: currentColor;
+		width: 0.75rem;
+	}
+
+	&.enlarge-icon {
+		svg {
+			transform: scale(1.5);
+		}
+	}
+
+	&.with-dropdown {
+		padding-right: 2rem;
+		position: relative;
+		overflow: hidden;
+
+		span {
+			position: absolute;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 1.375rem;
+			background: hsl(0deg 0% 0% / 20%);
+			border-left: 1px solid hsl(0deg 0% 0% / 15%);
+			transition: background 0.3s ease-in-out;
+		}
+
+		&:hover {
+			span {
+				background: var(--bg-overlay-2);
+			}
+		}
+	}
+
+	&:hover {
+		background-position: 100% 100%;
+	}
+
+	svg {
+		color: currentColor;
+		width: 0.75rem;
+	}
+
+	&.enlarge-icon {
+		svg {
+			transform: scale(1.5);
+		}
+	}
+
+	&.with-dropdown {
+		padding-right: 2rem;
+		position: relative;
+		overflow: hidden;
+
+		span {
+			position: absolute;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 1.375rem;
+			background: hsl(0deg 0% 0% / 20%);
+			border-left: 1px solid hsl(0deg 0% 0% / 15%);
+			transition: background 0.3s ease-in-out;
+		}
+
+		&:hover {
+			span {
+				background: var(--bg-overlay-2);
+			}
+		}
+	}
+}
+
+@mixin btn-primary {
+	color: var(--btn-color-primary);
+	background: var(--btn-bg-primary);
+	box-shadow: var(--shadow-m);
+	background-size: 100% 200%;
+}
+@mixin btn-secondary {
+	color: var(--btn-color-secondary);
+	background: var(--btn-bg-secondary);
+	box-shadow: var(--shadow-m);
+	background-size: 100% 200%;
+
+	&:hover {
+		background-position: 100% 100%;
+	}
+}
+@mixin btn-tertiary {
+	color: var(--btn-color-tertiary);
+	background: var(--btn-bg-tertiary);
+	background-size: 100% 200%;
+	background-position: 100% 100%;
+
+	&:hover {
+		background-position: 100% 200%;
+	}
+}
+@mixin btn-green {
+	color: var(--btn-color-green);
+	background: var(--btn-bg-green);
+	background-size: 100% 200%;
+}
+@mixin btn-red {
+	color: var(--btn-color-red);
+	background: var(--btn-bg-red);
+	background-size: 100% 200%;
+}
+@mixin btn-red-2 {
+	//color: var(--btn-color-red);
+	background: var(--btn-bg-red-2);
+	background-size: 100% 200%;
+}
+@mixin btn-box {
+	//border-radius: 0.375rem;
+	aspect-ratio: 1;
+
+	svg {
+		width: 1.125rem;
+		height: 1.125rem;
+	}
+}
+@mixin btn-s {
+	border-radius: 0.375rem;
+	font-size: var(--text-xs);
+	padding: var(--space-xs) var(--space-m);
+}
+@mixin btn-m {
+	font-size: var(--text-s);
+	padding: var(--space-s) var(--space-l);
+}
+@mixin btn-l {
+	font-size: var(--text-m);
+	padding: var(--space-m) var(--space-xl);
+}
+
+/*SVG ICONS */
+
+@mixin svg-xs {
+	width: 0.8rem;
+	height: 0.8rem;
+	> svg {
+		width: 100%;
+		height: 100%;
+	}
+}
+@mixin svg-s {
+	width: 1.25rem;
+	height: 1.25rem;
+	> svg {
+		width: 100%;
+		height: 100%;
+	}
+}
+@mixin svg-m {
+	width: 1.6rem;
+	height: 1.6rem;
+	> svg {
+		width: 100%;
+		height: 100%;
+	}
+}
+@mixin svg-l {
+	width: 2.6rem;
+	height: 2.6rem;
+	> svg {
+		width: 100%;
+		height: 100%;
+	}
+}
+@mixin svg-xl {
+	width: 3.5rem;
+	height: 3.5rem;
+	> svg {
+		width: 100%;
+		height: 100%;
+	}
+}
+@mixin svg-2xl {
+	width: 4.75rem;
+	height: 4.75rem;
+	> svg {
+		width: 100%;
+		height: 100%;
+	}
+}
+@mixin svg-3xl {
+	width: 7.5rem;
+	height: 7.5rem;
+	> svg {
+		width: 100%;
+		height: 100%;
+	}
+}

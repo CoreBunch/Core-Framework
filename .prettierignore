@@ -1,0 +1,14 @@
+.gitkeep
+.env*
+*.ico
+*.lock
+.yarn
+.pnp.*
+node_modules
+vendor
+.yaml
+.cjs
+.mjs
+.lock
+coverage
+dist

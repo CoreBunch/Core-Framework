@@ -1,0 +1,33 @@
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+export default {
+	preset: "ts-jest",
+	transform: {
+		"^.+\\.tsx?$": ["ts-jest", { tsconfig: "tsconfig.jest.json" }],
+	},
+	testEnvironment: "jsdom",
+	roots: ["<rootDir>/src", "<rootDir>/../core/src/components", "<rootDir>/../core/src/cssGenerator"],
+	testMatch: ["**/__tests__/**/*.test.ts"],
+	testPathIgnorePatterns: ["/node_modules/"],
+	coverageDirectory: "./coverage",
+	coveragePathIgnorePatterns: ["node_modules", "src/database", "src/test", "src/types", "src/read_only"],
+	reporters: ["default"],
+	moduleNameMapper: {
+		"css_reference.json": "<rootDir>/src/read_only/css_reference.json",
+		"\\.(css|less)$": "<rootDir>/src/__tests__/styleMock.js",
+		"^cssGenerator/(.*)$": "<rootDir>/../core/src/cssGenerator/$1",
+		"^cssGenerator$": "<rootDir>/../core/src/cssGenerator",
+		"^@core-framework/core/(.*)$": "<rootDir>/../core/src/$1",
+		"^components/(.*)$": "<rootDir>/src/components/$1",
+		"^constants/(.*)$": "<rootDir>/src/constants/$1",
+		"^data/(.*)$": "<rootDir>/src/data/$1",
+		"^utils/(.*)$": "<rootDir>/src/utils/$1",
+		"^utils$": "<rootDir>/src/utils",
+		"^assets/(.*)$": "<rootDir>/src/assets/$1",
+		"^hooks/(.*)$": "<rootDir>/src/hooks/$1",
+		"^hooks$": "<rootDir>/src/hooks",
+		"^state/(.*)$": "<rootDir>/src/state/$1",
+		"^state$": "<rootDir>/src/state",
+	},
+	moduleDirectories: ["node_modules", "src"],
+	modulePaths: ["<rootDir>/src"],
+};

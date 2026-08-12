@@ -1,0 +1,29 @@
+{
+	"name": "coreframework-gutenberg-blocks",
+	"version": "1.0.0",
+	"description": "Core Framework Gutenberg blocks.",
+	"author": "David Babinec",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/corebunch/core-framework.git",
+		"directory": "packages/blocks"
+	},
+	"main": "build/index.js",
+	"prettier": "../../.prettierrc.cjs",
+	"scripts": {
+		"build": "wp-scripts build",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"dev": "wp-scripts start"
+	},
+	"devDependencies": {
+		"@wordpress/block-editor": "^16.1.0",
+		"@wordpress/blocks": "^15.25.0",
+		"@wordpress/components": "^38.0.0",
+		"@wordpress/scripts": "^34.0.0"
+	}
+}

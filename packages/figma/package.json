@@ -1,0 +1,38 @@
+{
+	"name": "core-framework-figma",
+	"version": "1.0.0",
+	"description": "Figma integration for Core Framework",
+	"author": "David Babinec",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/corebunch/core-framework.git",
+		"directory": "packages/figma"
+	},
+	"scripts": {
+		"main": "esbuild main/code.ts --bundle --outfile=dist/code.js",
+		"ui": "tsc && vite build --minify esbuild",
+		"build": "concurrently -n main,ui \"npm run main\" \"npm run ui\"",
+		"dev": "concurrently -n main,ui \"npm run main -- --watch\" \"npm run ui -- --watch\""
+	},
+	"dependencies": {
+		"colord": "^2.9.3",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"ulid": "^2.3.0",
+		"zod": "^3.21.4"
+	},
+	"devDependencies": {
+		"@figma/plugin-typings": "^1.132.0",
+		"@types/react": "^18.3.31",
+		"@types/react-dom": "^18.3.7",
+		"@vitejs/plugin-react": "^4.7.0",
+		"concurrently": "^10.0.4",
+		"esbuild": "^0.28.1",
+		"rollup": "^4.62.4",
+		"sass": "^1.102.0",
+		"typescript": "^5.9.3",
+		"vite": "^6.4.3",
+		"vite-plugin-singlefile": "^2.3.3"
+	}
+}

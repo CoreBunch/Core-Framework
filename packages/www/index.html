@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="shortcut icon" href="/assets/images/favicon/favicon.ico" />
+		<link rel="apple-touch-icon" sizes="144x144" href="/assets/favicons/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicons/favicon-16x16.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/favicon-32x32.png" />
+		<link rel="manifest" href="/assets/favicons/site.webmanifest" />
+		<link rel="mask-icon" href="/assets/favicons/safari-pinned-tab.svg" color="#000000" />
+		<meta name="msapplication-config" content="/favicons/browserconfig.xml" />
+
+		<meta
+			property="description"
+			content="Say hello to Core Framework - a FREE modular CSS framework platform. It's a simple, modern, and easy-to-use modular utility framework with a powerful visual interface to configure for every build."
+		/>
+		<meta property="og:title" key="og:title" content="Core Framework" />
+		<meta property="og:description" key="og:description" content="Free modular CSS framework platform." />
+		<meta property="og:site_name" content="Core Framework" />
+		<meta property="og:image" content="/assets/core-framework-1200x630.jpg" />
+
+		<meta property="twitter:title" content="Core Framework" />
+		<meta property="twitter:card" content="/assets/core-framework-1200x630.jpg" />
+		<meta property="twitter:image" content="/assets/core-framework-1200x630.jpg" />
+		<meta property="twitter:description" content="Free modular CSS framework platform." />
+
+		<title>Core Framework</title>
+
+		<script>
+			const theme = localStorage.getItem("themeMode") || "dark";
+			document.documentElement.dataset.colorMode = theme;
+		</script>
+	</head>
+	<body>
+		<div id="modalRoot"></div>
+		<div id="root"></div>
+		<script type="module" src="/src/main.tsx"></script>
+	</body>
+</html>

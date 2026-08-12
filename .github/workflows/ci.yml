@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build & Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build web application
+        run: bun run build:www
+
+      - name: Build Figma plugin
+        run: bun run build:figma
+
+      - name: Build Gutenberg integration
+        run: bun run build:gutenberg
+
+      - name: Build builder integrations
+        run: bun run build:builders
+
+      - name: Build Gutenberg blocks
+        run: bun run build:blocks
+
+      - name: Build WordPress application
+        working-directory: packages/wp
+        env:
+          APP_ENV: production
+        run: bunx tsc && bunx vite build
+
+  test-web:
+    name: Test Web Application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Test
+        working-directory: packages/www
+        run: bunx jest --coverage --detectOpenHandles --watchman=false
+
+  test-php:
+    name: Test WordPress PHP
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.0"
+          tools: composer
+
+      - name: Install dependencies
+        working-directory: packages/wp
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Test
+        working-directory: packages/wp
+        run: vendor/bin/phpunit Tests
+
+      - name: Lint PHP syntax
+        run: find packages/wp -path packages/wp/vendor -prune -o -name '*.php' -print0 | xargs -0 -n1 php -l

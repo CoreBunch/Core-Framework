@@ -1,0 +1,42 @@
+{
+	"compilerOptions": {
+		"target": "esnext",
+		"lib": ["DOM", "DOM.Iterable", "ESNext"],
+		"jsx": "react-jsx",
+		"module": "esnext",
+		"baseUrl": "./src",
+		"resolveJsonModule": true,
+		"allowJs": false,
+		"checkJs": false,
+		"declarationMap": false,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"skipLibCheck": true,
+		"outDir": "types",
+		"moduleResolution": "Bundler",
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": false,
+		"isolatedModules": true,
+		"types": ["react", "react-dom", "node"],
+		"useDefineForClassFields": true,
+		"noEmit": true,
+		"paths": {
+			"jotai": ["../../../node_modules/jotai"],
+			"jotai/utils": ["../../../node_modules/jotai/utils"],
+			"jotai/vanilla": ["../../../node_modules/jotai/vanilla"],
+			"jotai/*": ["../../../node_modules/jotai/*"],
+			"@core-framework/core/*": ["../../core/src/*"],
+			"cssGenerator/*": ["../../core/src/cssGenerator/*"],
+			"cssGenerator": ["../../core/src/cssGenerator/index"]
+		}
+	},
+	"exclude": ["node_modules"],
+	"include": ["src"],
+	"references": [
+		{
+			"path": "./tsconfig.node.json"
+		}
+	]
+}

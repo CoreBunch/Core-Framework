@@ -1,0 +1,50 @@
+name: Integration help
+description: Ask for help with WordPress, Figma, Gutenberg, Bricks, or Oxygen integration.
+title: "[Integration]: "
+labels:
+  - integration
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not paste passwords, WordPress nonces, connection keys, private site URLs, or private project data.
+  - type: dropdown
+    id: integration
+    attributes:
+      label: Integration
+      options:
+        - WordPress
+        - Figma
+        - Gutenberg
+        - Bricks
+        - Oxygen
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Where does it fail?
+      description: Include the steps you followed and the result you received.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include relevant Core Framework, WordPress, PHP, Figma, or builder versions.
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Include relevant output with secrets and private information redacted.
+    validations:
+      required: false
