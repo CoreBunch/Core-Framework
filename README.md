@@ -140,7 +140,7 @@ Selectors and their CSS declarations stay readable in the visual editor, with br
 
 ### Portable projects, deliberate defaults
 
-Export a project, import a local `.core` file, use a shareable remote link, and control how the final CSS behaves—from root sizing and themes to PostCSS, prefixes, reduced motion, and touch-device behavior.
+Export or import a portable local `.core` file, and control how the final CSS behaves—from root sizing and themes to PostCSS, prefixes, reduced motion, and touch-device behavior.
 
 <table>
   <tr>
@@ -179,7 +179,7 @@ The standalone app stores projects in browser storage, so exploring Core Framewo
 | Shared application | `packages/core` | Visual editor, schemas, state, CSS generation, and shared business logic |
 | Web app | `packages/www` | Standalone browser app with local project storage |
 | WordPress | `packages/wp` | Plugin shell, persistence, REST API, generated CSS delivery, and release packaging |
-| Figma | `packages/figma` | Figma plugin UI and project-variable synchronization |
+| Figma | `packages/figma` | Self-contained Figma plugin with the editor bundled into the plugin UI |
 | Gutenberg | `packages/gutenberg`, `packages/blocks` | Classes, colors, theme preview, editor integration, and blocks |
 | Bricks and Oxygen | `packages/builder-integrations` | Classes, variables, colors, and builder-specific helpers |
 
@@ -238,7 +238,7 @@ Build the production plugin with `bun run build:wp`. Tagged releases are assembl
 bun run build:figma
 ```
 
-In Figma, open **Plugins → Development → Import plugin from manifest** and select `packages/figma/manifest.json`. Run `bun run dev:figma` while working on the plugin.
+In Figma, open **Plugins → Development → Import plugin from manifest** and select `packages/figma/manifest.json`. Run `bun run dev:figma` while working on the plugin. The shared editor is built into the plugin; no hosted Core Framework app or license key is required.
 
 ## How the repository fits together
 
@@ -272,7 +272,7 @@ The visual application lives in `packages/core`. The web, WordPress, and Figma p
 
 ## Hosted services and privacy
 
-Editing a local project and generating CSS do not require a Core Framework account, license server, or API key. Some opt-in sharing, remote-project import, and synchronization flows communicate with services hosted by Core Framework. Direct Figma-to-WordPress synchronization uses a connection key created by the WordPress site.
+Editing a local project and generating CSS do not require a Core Framework account, license server, or API key. The bundled Figma editor works locally, while optional Figma-to-WordPress synchronization connects directly to a user-selected WordPress site using a site-generated connection credential (not a license key).
 
 Google Fonts are requested through Google's public, keyless CSS endpoints only when a user chooses to browse or use Google-hosted fonts.
 

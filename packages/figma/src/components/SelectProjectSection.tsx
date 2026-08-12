@@ -7,11 +7,8 @@ import { generateSpacingObjects } from "../spacing/getFluidSpacingVariables";
 import { ColorVariable, Declaration, Preset, SimpleVariable } from "../types";
 import { generateFluidTypographyObjects } from "../typography/getFluidTypeVariables";
 import { devLog } from "../utils";
-import { postMessageToIframe, postMessageToParent } from "../utils/frameMessaging";
+import { isMessageFromEditor, postMessageToIframe, postMessageToParent } from "../utils/frameMessaging";
 import { Card } from "./Card";
-
-export const DEFAULT_PROJECT_ID = "01HMB7EMKGNDV86N20VTS7J0MZ";
-const WEB_SYNC_PREFIX = "cfweb:";
 
 interface SelectProjectSection {
 	handleShowIframe: (value: boolean | null) => void;
@@ -29,43 +26,15 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 
 	const onImport = (apiKey: string) => {
 		setIsLoading(true);
+		setError(null);
 
-		if (!apiKey) {
+		const connectionKey = apiKey.trim();
+		if (!connectionKey) {
 			setIsLoading(false);
 			return;
 		}
-		let parsedApiKey = apiKey;
-		if (apiKey.startsWith("https://")) {
-			const url = new URL(apiKey ?? "");
-			parsedApiKey = url.pathname.split("/")[2];
-		}
 
-		const isWebProject = parsedApiKey.length === DEFAULT_PROJECT_ID.length;
-		const isWebSyncKey = parsedApiKey.startsWith(WEB_SYNC_PREFIX);
-
-		postMessageToIframe("cf-figma-set-api-key", {
-			apiKey: isWebProject ? "" : parsedApiKey,
-		});
-
-		if (!isWebProject && !isWebSyncKey) {
-			try {
-				const [pass, url] = [parsedApiKey.slice(0, 24), decodeURIComponent(parsedApiKey.slice(24))];
-				postMessageToParent({
-					type: "import-project-from-plugin-api",
-					apiKey,
-					pass,
-					url: url.replace("http://", "https://"),
-				});
-			} catch (e) {
-				console.error(e);
-				setError("An error occurred while validating the project ID. Please try again.");
-				setIsLoading(false);
-			}
-
-			return;
-		}
-
-		postMessageToParent({ type: "import-project", apiKey: parsedApiKey });
+		postMessageToParent({ type: "import-project-from-plugin-api", apiKey: connectionKey });
 	};
 
 	interface SyncVariablesProps {
@@ -195,21 +164,30 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 	};
 
 	useEffect(() => {
-		window.onmessage = (event: {
-			data?: {
+		const handlePluginMessage = (
+			event: MessageEvent<{
 				pluginMessage?: {
-					type?: any;
-					message?: any;
+					type?: string;
+					error?: string;
 					projectId?: string;
 					preset?: Preset;
 				};
-			};
-		}) => {
+			}>,
+		) => {
+			if (event.data?.pluginMessage && event.source !== parent) return;
+
 			const pluginMessage = event?.data?.pluginMessage;
 			devLog("pluginMessage", pluginMessage);
 			switch (pluginMessage?.type) {
-				// Note: "import-project" and "import-project-error" are handled in app.tsx
-				// because this component unmounts after project loads
+				case "import-project": {
+					setIsLoading(false);
+					break;
+				}
+				case "import-project-error": {
+					setIsLoading(false);
+					setError(pluginMessage?.error || "Could not connect. Check the WordPress connection key.");
+					break;
+				}
 				case "added-variables": {
 					setIsLoading(false);
 					break;
@@ -218,12 +196,8 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 					const receivedApiKey = event.data.pluginMessage?.projectId;
 
 					if (receivedApiKey) {
-						postMessageToIframe("cf-figma-set-api-key", {
-							apiKey: receivedApiKey.length === DEFAULT_PROJECT_ID.length ? "" : receivedApiKey,
-						});
-
+						postMessageToIframe("cf-figma-set-api-key", { apiKey: receivedApiKey });
 						setApiKey(receivedApiKey);
-						// onImport(receivedApiKey); // This will automatically open the latest project
 					}
 
 					break;
@@ -238,17 +212,22 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 				}
 			}
 		};
+		window.addEventListener("message", handlePluginMessage);
 
 		postMessageToParent({ type: "get-project-id" });
 		postMessageToParent({ type: "get-project-locally" });
 
-		window.addEventListener("message", (event) => {
-			if (event.data.type === "cf-figma-ready") {
+		const handleEditorMessage = (event: MessageEvent) => {
+			if (isMessageFromEditor(event) && event.data.type === "cf-figma-ready") {
 				devLog("Figma is ready");
 			}
-			// Note: "cf-push" and "cf-push-local" are handled in app.tsx
-			// because this component unmounts after project loads
-		});
+		};
+		window.addEventListener("message", handleEditorMessage);
+
+		return () => {
+			window.removeEventListener("message", handlePluginMessage);
+			window.removeEventListener("message", handleEditorMessage);
+		};
 	}, []);
 
 	return (
@@ -256,10 +235,10 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 			<div className="content-row">
 				<Card
 					icon="cloud"
-					title="Connect existing project"
+					title="Connect a WordPress project"
 					input={{
-						label: "Project ID / Connection key",
-						placeholder: "Enter Project ID / Connection key",
+						label: "WordPress connection key",
+						placeholder: "Paste the key from Core Framework → Figma",
 						value: apiKey,
 						disabled: isLoading,
 						onChange: (e) => setApiKey((e.target as HTMLInputElement).value),
@@ -269,14 +248,10 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 						disabled: isLoading,
 					}}
 					footerContent={
-						<>
-							<p>
-								<span>Web App</span>: Enter Project ID of your web project.
-							</p>
-							<p>
-								<span>WordPress</span>: Enter a connection key from the Figma add-on settings panel
-							</p>
-						</>
+						<p>
+							This is a private connection credential, not a license key. Core Framework for Figma is free and
+							open source.
+						</p>
 					}
 					onSubmit={handleSubmit}
 					error={error}

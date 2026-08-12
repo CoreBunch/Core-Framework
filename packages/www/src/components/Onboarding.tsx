@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, memo, useCallback, useState } from "react";
+import logo from "../../public/logo_transparent.png";
 import { Select, Switch } from "@mantine/core";
 import clsx from "clsx";
 import { devLog } from "functions/devLog";
@@ -301,7 +302,7 @@ export const Onboarding = memo(({ setIsOnboarding }: IOnboarding) => {
 
 				<div className="header">
 					<div className="left">
-						<img src={"./logo_transparent.png"} alt="Core Framework Logo" />
+						<img src={logo} alt="Core Framework Logo" />
 						<h1>Let's get started</h1>
 					</div>
 

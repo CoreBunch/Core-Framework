@@ -1,4 +1,6 @@
 import { memo } from "react";
+import figmaIcon from "../../public/assets/figma.png";
+import logo from "../../public/logo_transparent.png";
 import { Refresh } from "../assets/icons/Refresh.icon";
 import { Loader } from "@mantine/core";
 import { clsx } from "clsx";
@@ -37,11 +39,11 @@ export const Nav = memo(() => {
 		? [
 				{
 					name: "Figma",
-					icon: () => <img src={"./assets/figma.png"} alt={"Figma"} style={{ borderRadius: "3px" }} />,
+					icon: () => <img src={figmaIcon} alt="Figma" style={{ borderRadius: "3px" }} />,
 					value: "FIGMA",
 				},
 				...NAV_ITEMS_BOTTOM,
-		  ]
+			]
 		: NAV_ITEMS_BOTTOM;
 
 	return (
@@ -54,7 +56,7 @@ export const Nav = memo(() => {
 						</li>
 					</Tooltip>
 
-					{isFigma() ? (
+					{isFigma() && figma.apiKey ? (
 						<Tooltip label="Refresh" position="bottom-start">
 							<li
 								id="refresh-figma"
@@ -114,7 +116,7 @@ export const Nav = memo(() => {
 
 			<hr />
 			<div className="text-2xs opacity-50 padding-xs version">
-				<img src="./logo_transparent.png" alt="Core Framework Logo" />
+				<img src={logo} alt="Core Framework Logo" />
 				<span>{APP_VERSION}</span>
 			</div>
 		</nav>

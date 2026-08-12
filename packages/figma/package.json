@@ -11,9 +11,11 @@
 	},
 	"scripts": {
 		"main": "esbuild main/code.ts --bundle --outfile=dist/code.js",
+		"editor": "vite build --config vite.editor.config.ts",
+		"editor:watch": "vite build --config vite.editor.config.ts --watch",
 		"ui": "tsc && vite build --minify esbuild",
-		"build": "concurrently -n main,ui \"npm run main\" \"npm run ui\"",
-		"dev": "concurrently -n main,ui \"npm run main -- --watch\" \"npm run ui -- --watch\""
+		"build": "bun run editor && concurrently -n main,ui \"bun run main\" \"bun run ui\"",
+		"dev": "bun run editor && concurrently -n editor,main,ui \"bun run editor:watch\" \"bun run main -- --watch\" \"bun run ui -- --watch\""
 	},
 	"dependencies": {
 		"colord": "^2.9.3",

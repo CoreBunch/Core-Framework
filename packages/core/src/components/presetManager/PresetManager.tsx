@@ -21,7 +21,6 @@ import { useAtomCallback } from "jotai/utils";
 import { toast } from "sonner";
 import { ulid } from "ulid";
 import { convertSafeCssName, downloadFile, encodeCompressedString } from "utils";
-import { z } from "zod";
 import { Info } from "assets/icons/Info.icon";
 import { Dropzone } from "components/basic/Dropzone";
 import { Loader } from "components/basic/Loader";
@@ -64,8 +63,6 @@ export const PresetManger = memo(() => {
 	}>({
 		color: null,
 	});
-
-	const [isExternalPresetLoading, setIsExternalPresetLoading] = useState(false);
 
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -338,76 +335,6 @@ export const PresetManger = memo(() => {
 				},
 			};
 		});
-	}
-
-	async function onExternalImportSubmit(e: React.FormEvent<HTMLFormElement>) {
-		e.preventDefault();
-		setIsExternalPresetLoading(true);
-
-		try {
-			const value = e.currentTarget.url.value.trim() ?? "";
-			let id = "";
-
-			if (value.startsWith("https://")) {
-				const url = new URL(e.currentTarget.url.value ?? "");
-				id = url.pathname.split("/")[2];
-			} else id = value;
-
-			if (!id) {
-				toast.error("Invalid URL, please try again");
-				setIsExternalPresetLoading(false);
-				return;
-			}
-
-			if (id.length !== 26) {
-				toast.error("Invalid URL, please try again");
-				setIsExternalPresetLoading(false);
-				return;
-			}
-
-			const response = await fetch(
-				`https://us-central1-core-framework-6bdc9.cloudfunctions.net/getPreset?id=${id}`,
-			);
-
-			const json = await response.json();
-
-			const schema = z.object({
-				success: z.boolean(),
-				data: z
-					.object({
-						json: z.string(),
-					})
-					.optional(),
-			});
-
-			const parsed = schema.parse(json);
-
-			if (!parsed.success || !parsed.data) {
-				setIsExternalPresetLoading(false);
-				return toast.error("Something went wrong, please make sure you pasted link to public project");
-			}
-
-			const preset = JSON.parse(parsed.data.json) as Preset;
-
-			const parseReturn = validatePreset(preset);
-
-			if (!parseReturn.success) {
-				setIsExternalPresetLoading(false);
-				return toast.error("Preset not valid");
-			}
-
-			const preparedPreset = preparePresetToLoad({
-				preset,
-				oldPreferences: await getPreferences(),
-			});
-
-			setExternalPreset(preparedPreset);
-			setIsExternalPresetLoading(false);
-		} catch (e) {
-			setIsExternalPresetLoading(false);
-			toast.error("Something went wrong");
-			console.warn(e);
-		}
 	}
 
 	const onProjectExport = useCallback(async () => {
@@ -1004,49 +931,6 @@ export const PresetManger = memo(() => {
 				/>
 
 				<Dropzone onDrop={onExternalPresetDrop} accept={`.json,.${CORE_FILE_FORMAT}`} multiple={false} />
-
-				<div className="grid padding-l radius align-center gap-m bg-overlay-1">
-					<div className="grid gap-xs">
-						<h4>Remote import from the link</h4>
-						<p className="text-s">
-							<span className="opacity-50">
-								You can import a project remotely by pasting a shareable link or a project ID from the web
-								app.
-							</span>
-						</p>
-						<a
-							style={{
-								fontWeight: "600",
-								fontSize: "var(--text-s)",
-								color: "var(--color-main)",
-							}}
-							target="_blank"
-							href="https://docs.coreframework.com/remote-import"
-						>
-							How it works?
-						</a>
-					</div>
-
-					<form onSubmit={onExternalImportSubmit} className="row align-center gap-s full-width">
-						<input
-							type="text"
-							name="url"
-							placeholder="https://coreframework.com/app/..."
-							className="full-width"
-							style={{
-								flex: 1,
-							}}
-						/>
-
-						{isExternalPresetLoading ? (
-							<Loader />
-						) : (
-							<button type="submit" className="btn-tertiary btn-l">
-								Confirm
-							</button>
-						)}
-					</form>
-				</div>
 			</div>
 		</div>
 	);

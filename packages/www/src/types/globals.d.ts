@@ -28,6 +28,7 @@ declare global {
 
 	interface Window {
 		secret_dev_mode?: boolean;
+		__CORE_FRAMEWORK_FIGMA__?: boolean;
 	}
 
 	/**

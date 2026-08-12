@@ -1,3 +1,3 @@
 export const isFigma = () => {
-	return window.location.hash.includes("#figma");
+	return window.__CORE_FRAMEWORK_FIGMA__ === true || window.location.hash.includes("#figma");
 };
