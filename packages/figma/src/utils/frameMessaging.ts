@@ -8,6 +8,12 @@ export const isMessageFromEditor = (event: MessageEvent) => {
 	return Boolean(iframe?.contentWindow && event.source === iframe.contentWindow);
 };
 
+export const getPluginMessage = <T extends Record<string, unknown>>(event: MessageEvent): T | null => {
+	const pluginMessage = event.data?.pluginMessage;
+
+	return pluginMessage && typeof pluginMessage === "object" ? (pluginMessage as T) : null;
+};
+
 export const postMessageToParent = (message: Record<string, unknown>) => {
 	parent.postMessage({ pluginMessage: message }, "*");
 };

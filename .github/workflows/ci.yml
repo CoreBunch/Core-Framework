@@ -40,6 +40,9 @@ jobs:
       - name: Build Figma plugin
         run: bun run build:figma
 
+      - name: Test Figma plugin messaging
+        run: bun run --filter './packages/figma' test
+
       - name: Build Gutenberg integration
         run: bun run build:gutenberg
 
