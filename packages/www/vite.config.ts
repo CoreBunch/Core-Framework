@@ -1,7 +1,11 @@
 import react from "@vitejs/plugin-react-swc";
+import { createRequire } from "node:module";
 import path from "path";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+
+const require = createRequire(import.meta.url);
+const jotaiRoot = path.dirname(require.resolve("jotai/package.json"));
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -26,59 +30,35 @@ export default defineConfig({
 			// through to their own more-specific aliases below.
 			{
 				find: /^jotai$/,
-				replacement: path.resolve(
-					__dirname,
-					"../../node_modules/jotai/esm/index.mjs",
-				),
+				replacement: path.join(jotaiRoot, "esm/index.mjs"),
 			},
 			{
 				find: "jotai/index",
-				replacement: path.resolve(
-					__dirname,
-					"../../node_modules/jotai/esm/index.mjs",
-				),
+				replacement: path.join(jotaiRoot, "esm/index.mjs"),
 			},
 			{
 				find: "jotai/utils",
-				replacement: path.resolve(
-					__dirname,
-					"../../node_modules/jotai/esm/utils.mjs",
-				),
+				replacement: path.join(jotaiRoot, "esm/utils.mjs"),
 			},
 			{
 				find: "jotai/react/utils",
-				replacement: path.resolve(
-					__dirname,
-					"../../node_modules/jotai/esm/react/utils.mjs",
-				),
+				replacement: path.join(jotaiRoot, "esm/react/utils.mjs"),
 			},
 			{
 				find: "jotai/react",
-				replacement: path.resolve(
-					__dirname,
-					"../../node_modules/jotai/esm/react.mjs",
-				),
+				replacement: path.join(jotaiRoot, "esm/react.mjs"),
 			},
 			{
 				find: "jotai/vanilla/internals",
-				replacement: path.resolve(
-					__dirname,
-					"../../node_modules/jotai/esm/vanilla/internals.mjs",
-				),
+				replacement: path.join(jotaiRoot, "esm/vanilla/internals.mjs"),
 			},
 			{
 				find: "jotai/vanilla/utils",
-				replacement: path.resolve(
-					__dirname,
-					"../../node_modules/jotai/esm/vanilla/utils.mjs",
-				),
+				replacement: path.join(jotaiRoot, "esm/vanilla/utils.mjs"),
 			},
 			{
 				find: "jotai/vanilla",
-				replacement: path.resolve(
-					__dirname,
-					"../../node_modules/jotai/esm/vanilla.mjs",
-				),
+				replacement: path.join(jotaiRoot, "esm/vanilla.mjs"),
 			},
 			{
 				find: "@core-framework/core",
@@ -103,27 +83,6 @@ export default defineConfig({
 			{ find: "hooks", replacement: path.resolve(__dirname, "src/hooks") },
 			{ find: "state", replacement: path.resolve(__dirname, "src/state") },
 		],
-		dedupe: [
-			"jotai",
-			"react",
-			"react-dom",
-			"@react-spectrum/provider",
-			"@react-aria/utils",
-			"@react-aria/ssr",
-			"@react-stately/utils",
-			"@react-spectrum/utils",
-			"react-aria-components",
-			"@codemirror/state",
-			"@codemirror/view",
-			"@codemirror/language",
-			"@codemirror/autocomplete",
-			"@codemirror/commands",
-			"@codemirror/lint",
-			"@codemirror/lang-css",
-			"@lezer/common",
-			"@lezer/highlight",
-			"@lezer/lr",
-			"@lezer/css",
-		],
+		dedupe: ["jotai", "react", "react-dom"],
 	},
 });

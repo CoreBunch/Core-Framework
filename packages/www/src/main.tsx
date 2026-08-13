@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "@fontsource-variable/inter/wght.css";
 import { MantineProvider } from "@mantine/core";
 import { Toaster } from "sonner";
 import { App } from "./App";

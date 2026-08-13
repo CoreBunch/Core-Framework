@@ -37,6 +37,8 @@ git push origin v2.0.0
 
 The tag version must exactly match the WordPress plugin header, package metadata (including `packages/figma/package.json`), Core Framework version constant, and WordPress.org stable tag. The release builders reject mismatches.
 
+The release builders also reject retired hosted-service URLs, remote placeholder images, the removed remote interface font, and stale Figma version copy. They generate a production dependency license inventory for each artifact.
+
 The GitHub Release contains:
 
 - `core-framework-X.Y.Z.zip` for WordPress and WordPress.org deployment.

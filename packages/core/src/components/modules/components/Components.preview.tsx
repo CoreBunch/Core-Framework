@@ -4,6 +4,7 @@ import { useAtomCallback } from "jotai/utils";
 import { Loader } from "components/basic/Loader";
 import { useEffectOnce } from "hooks/useEffectOnce";
 import { presetPreferencesSelector } from "state";
+import { PREVIEW_IMAGE_DATA_URL } from "../../../constants/previewImage";
 import { cssReset } from "./constants";
 import type { ComponentsType } from "./types";
 
@@ -147,7 +148,7 @@ const addElement = ({ type, body, selectors }: IAddElement) => {
 			break;
 		case "img":
 			node = document.createElement("img");
-			node.src = "https://picsum.photos/320/240";
+				node.src = PREVIEW_IMAGE_DATA_URL;
 			node.alt = "Preview of image";
 
 			break;

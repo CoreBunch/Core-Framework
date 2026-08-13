@@ -41,8 +41,10 @@ Fork maintainers who publish their own Community listing must create their own p
 
 You can create and save a project locally without any network connection. To synchronize with WordPress, create a connection key in **Core Framework → Figma** on the WordPress site and enter it in the Figma plugin. This key authenticates requests to that WordPress site; it is not a product license. Treat it as a secret and revoke it from WordPress when it is no longer needed.
 
+The plugin connects directly to the WordPress origin encoded in that key; project data is not routed through Core Framework servers. The bundled Google Fonts catalog is local. Google is contacted only when a user selects, previews, or imports a Google-hosted font. See Google's [Terms of Service](https://policies.google.com/terms) and [Privacy Policy](https://policies.google.com/privacy).
+
 The plugin no longer supports the legacy hosted web-project IDs or `cfweb:` synchronization keys. Export those projects as `.core` files and import them locally instead.
 
 ## License
 
-MIT. See the repository [LICENSE](../../LICENSE).
+Core Framework's original source is MIT licensed. Bundled dependencies retain their respective open-source licenses. Release ZIPs include the repository license, adapted-source notices, and a generated production dependency license inventory.

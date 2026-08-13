@@ -34,8 +34,11 @@ jobs:
       - name: Install JavaScript dependencies
         run: bun install --frozen-lockfile
 
-      - name: Audit critical JavaScript dependencies
-        run: bun audit --audit-level=critical
+      - name: Audit JavaScript dependencies
+        # extract-zip has no patched release and is only reachable through the
+        # @wordpress/scripts Puppeteer browser downloader, which this workflow
+        # does not invoke or ship. SECURITY.md documents the temporary exception.
+        run: bun run audit:security
 
       - name: Install PHP development dependencies
         working-directory: packages/wp
@@ -61,6 +64,12 @@ jobs:
 
       - name: Build Figma plugin
         run: bun run build:figma
+
+      - name: Build WordPress plugin
+        run: bun run build:wp
+
+      - name: Verify open-source boundaries
+        run: bun run check:open-source
 
   package:
     name: Build Release Artifacts
@@ -96,6 +105,9 @@ jobs:
 
       - name: Build Figma release
         run: bun run release:figma -- "${{ steps.version.outputs.version }}"
+
+      - name: Test WordPress release in a live site
+        run: bash scripts/test-wp-e2e.sh ".tmp/release/core-framework-${{ steps.version.outputs.version }}.zip"
 
       - name: Upload release artifacts
         uses: actions/upload-artifact@v4

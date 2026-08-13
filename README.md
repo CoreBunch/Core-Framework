@@ -207,6 +207,16 @@ bun run test:www
 bun run build:www
 ```
 
+The production site is written to `packages/www/dist`. It is a static application: serve that directory from any static web server or hosting provider. Projects remain in the user's browser storage; no application server, database, Core Framework account, or license service is required.
+
+For a domain root such as `https://framework.example.com/`, use the command above. For a subpath, pass the public base path to Vite:
+
+```sh
+bun run --filter './packages/www' build -- --base=/core-framework/
+```
+
+Then publish `packages/www/dist` at the matching path, such as `https://example.com/core-framework/`.
+
 ## WordPress development
 
 Requirements: WordPress 6.0 or newer, PHP 8.0 or newer, Composer, Bun 1.3.x, and a local HTTPS certificate.
@@ -231,6 +241,8 @@ Requirements: WordPress 6.0 or newer, PHP 8.0 or newer, Composer, Bun 1.3.x, and
 4. Activate **Core Framework** in WordPress.
 
 Build the production plugin with `bun run build:wp`. Tagged releases are assembled by the automated release workflow; pushes to `main` do not publish a plugin update. Maintainers can find the full process in [RELEASING.md](RELEASING.md).
+
+Run `bun run e2e:wp` to build the distributable ZIP and install it into a disposable Docker-based WordPress site. The test uses WP-CLI to verify installation, activation, database setup, generated CSS, REST authorization, the Figma connection-key lifecycle, local editor assets, and deactivation/reactivation. Docker and curl are required; the test environment is removed automatically.
 
 ## Install the Figma plugin
 
@@ -286,7 +298,13 @@ The visual application lives in `packages/core`. The web, WordPress, and Figma p
 
 Editing a local project and generating CSS do not require a Core Framework account, license server, or API key. The bundled Figma editor works locally, while optional Figma-to-WordPress synchronization connects directly to a user-selected WordPress site using a site-generated connection credential (not a license key).
 
-Google Fonts are requested through Google's public, keyless CSS endpoints only when a user chooses to browse or use Google-hosted fonts.
+The Google Fonts catalog is bundled locally. Google is contacted only when a user selects, previews, or imports a Google-hosted font; the application requests CSS from `fonts.googleapis.com` and, during import, font files from `fonts.gstatic.com`. The WordPress integration stores imported font files locally. See Google's [Terms of Service](https://policies.google.com/terms) and [Privacy Policy](https://policies.google.com/privacy).
+
+The application does not load preview images, interface fonts, telemetry, or executable code from Core Framework servers.
+
+## Third-party licensing
+
+Core Framework's original source is MIT licensed. Dependencies and adapted source retain their respective open-source licenses. Release builds include `THIRD_PARTY_NOTICES.md` (or `third-party-notices.txt`) and a generated `THIRD_PARTY_LICENSES.txt` (or `third-party-licenses.txt`) containing the production dependency inventory and available license texts.
 
 ## Marketplace
 

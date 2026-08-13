@@ -32,8 +32,7 @@
 	},
 	"require": {
 		"php": ">=8.0",
-		"composer/installers": "^2.2",
-		"micropackage/requirements": "^1.2"
+		"composer/installers": "^2.2"
 	},
 	"require-dev": {
 		"php-stubs/wordpress-stubs": "^6.1",

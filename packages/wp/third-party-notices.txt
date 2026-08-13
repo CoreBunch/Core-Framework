@@ -4,6 +4,8 @@ Third-Party Notices
 Core Framework includes adapted sun and moon icons from Heroicons.
 It also includes an adapted PostCSS 8 implementation of postcss-easing-gradients.
 
+Release archives also contain a generated third-party-licenses.txt with the production JavaScript and Composer dependency inventory and available license texts.
+
 Heroicons
 ---------
 

@@ -83,8 +83,7 @@ export const Figma = memo(() => {
 				<div className="bg-blue radius padding-xl">
 					<p className="text-m opacity-60">
 						Seamlessly synchronize your project between Core Framework's Web App/WordPress plugin and the Core
-					Framework plugin inside Figma. Connect the Figma plugin using the Project ID or connection key found
-						below.
+							Framework plugin inside Figma. Connect the Figma plugin using the connection key found below.
 					</p>
 				</div>
 			</div>

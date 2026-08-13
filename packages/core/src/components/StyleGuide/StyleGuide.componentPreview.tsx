@@ -1,4 +1,5 @@
 import { ComponentsType } from "components/modules/components";
+import { PREVIEW_IMAGE_DATA_URL } from "../../constants/previewImage";
 
 const safeAddClass = (node: HTMLElement | SVGElement, className: string) => {
 	if (node.classList.contains(className)) {
@@ -139,7 +140,7 @@ export const createElement = ({ type, selectors }: IAddElement) => {
 			break;
 		case "img":
 			node = document.createElement("img");
-			node.src = "https://picsum.photos/320/240";
+				node.src = PREVIEW_IMAGE_DATA_URL;
 			node.alt = "Preview of image";
 
 			break;

@@ -1,3 +1,5 @@
+import packageJson from "../../package.json";
+
 export const footerLinks = [
 	{
 		label: "Facebook Community",
@@ -16,7 +18,7 @@ export const footerLinks = [
 		link: "https://coreframework.com/?utm_source=figma-plugin&open_intercom=true",
 	},
 	{
-		label: "Version 1.0.1",
+		label: `Version ${packageJson.version}`,
 		link: "https://docs.coreframework.com/changelog/changelog",
 	},
 ];
