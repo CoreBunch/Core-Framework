@@ -42,6 +42,7 @@
 		"bump": "bun run scripts/version-change.ts",
 		"version": "bun run scripts/version.ts",
 		"release": "bun run scripts/release.ts",
+		"release:figma": "bun run scripts/build-figma-release.ts",
 		"release:wp": "bun run scripts/build-wp-release.ts",
 		"prepare": "husky",
 		"dev:www": "bun run --filter './packages/www' dev",

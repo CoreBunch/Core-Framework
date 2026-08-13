@@ -232,6 +232,17 @@ Requirements: WordPress 6.0 or newer, PHP 8.0 or newer, Composer, Bun 1.3.x, and
 
 Build the production plugin with `bun run build:wp`. Tagged releases are assembled by the automated release workflow; pushes to `main` do not publish a plugin update. Maintainers can find the full process in [RELEASING.md](RELEASING.md).
 
+## Install the Figma plugin
+
+Each [GitHub Release](https://github.com/corebunch/core-framework/releases) includes a self-contained `core-framework-figma-X.Y.Z.zip`:
+
+1. Download and extract the Figma ZIP.
+2. Open Figma Desktop.
+3. Go to **Plugins → Development → Import plugin from manifest**.
+4. Select `core-framework-figma/manifest.json` from the extracted folder.
+
+This local installation is independent of Figma Community and does not update automatically. Download and import the newer archive when a new release is available. Publishing an update to Figma Community is a separate maintainer action in Figma Desktop; the GitHub release workflow does not publish to Community.
+
 ## Figma development
 
 ```sh
@@ -268,6 +279,7 @@ The visual application lives in `packages/core`. The web, WordPress, and Figma p
 | `bun run php-test:wp` | Run WordPress PHP tests after Composer install |
 | `bun run dev:figma` | Watch the Figma plugin |
 | `bun run build:figma` | Build the Figma plugin |
+| `bun run release:figma -- X.Y.Z` | Build the self-contained Figma release ZIP |
 | `bun run lint` | Lint the web and WordPress packages |
 
 ## Hosted services and privacy
