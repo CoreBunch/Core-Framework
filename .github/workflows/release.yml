@@ -63,7 +63,7 @@ jobs:
         run: bun run build:figma
 
   package:
-    name: Build WordPress Release
+    name: Build Release Artifacts
     runs-on: ubuntu-latest
     needs: verify
     outputs:
@@ -94,11 +94,16 @@ jobs:
       - name: Build WordPress release
         run: bun run release:wp -- "${{ steps.version.outputs.version }}"
 
-      - name: Upload release artifact
+      - name: Build Figma release
+        run: bun run release:figma -- "${{ steps.version.outputs.version }}"
+
+      - name: Upload release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: core-framework-${{ steps.version.outputs.version }}
-          path: .tmp/release/core-framework-${{ steps.version.outputs.version }}.zip
+          name: core-framework-release-${{ steps.version.outputs.version }}
+          path: |
+            .tmp/release/core-framework-${{ steps.version.outputs.version }}.zip
+            .tmp/release/core-framework-figma-${{ steps.version.outputs.version }}.zip
           if-no-files-found: error
           retention-days: 30
 
@@ -108,10 +113,10 @@ jobs:
     needs: package
     environment: wordpress-org
     steps:
-      - name: Download release artifact
+      - name: Download release artifacts
         uses: actions/download-artifact@v4
         with:
-          name: core-framework-${{ needs.package.outputs.version }}
+          name: core-framework-release-${{ needs.package.outputs.version }}
           path: .tmp/release
 
       - name: Extract WordPress release
@@ -144,11 +149,12 @@ jobs:
             --title "Core Framework ${{ needs.package.outputs.version }}" \
             --generate-notes
 
-      - name: Upload WordPress ZIP to GitHub Release
+      - name: Upload ZIPs to GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
           gh release upload "$GITHUB_REF_NAME" \
             ".tmp/release/core-framework-${{ needs.package.outputs.version }}.zip" \
+            ".tmp/release/core-framework-figma-${{ needs.package.outputs.version }}.zip" \
             --clobber

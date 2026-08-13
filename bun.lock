@@ -74,7 +74,7 @@
     },
     "packages/figma": {
       "name": "core-framework-figma",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "colord": "^2.9.3",
         "react": "^18.2.0",

@@ -8,6 +8,7 @@
  * All packages share a single version. Files updated:
  * - packages/blocks/src/theme-toggle/block.json
  * - packages/core/src/constants/version.ts
+ * - packages/figma/package.json
  * - packages/gutenberg/package.json
  * - packages/gutenberg/plugin.php
  * - packages/wp/gutenberg-blocks/theme-toggle/block.json
@@ -27,6 +28,7 @@ import { c, log, logStep, logSuccess, logWarning, logError, chooseBump, confirm 
 const VERSION_FILES = [
 	"packages/blocks/src/theme-toggle/block.json",
 	"packages/core/src/constants/version.ts",
+	"packages/figma/package.json",
 	"packages/gutenberg/package.json",
 	"packages/gutenberg/plugin.php",
 	"packages/wp/gutenberg-blocks/theme-toggle/block.json",

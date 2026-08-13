@@ -37,12 +37,13 @@ await $`bun run test:www -- --watchman=false`;
 await $`composer install --working-dir=packages/wp --prefer-dist --no-interaction --no-progress`;
 await $`packages/wp/vendor/bin/phpunit packages/wp/Tests`;
 await $`bun run release:wp -- ${version}`;
+await $`bun run release:figma -- ${version}`;
 
 console.log(`\nReady to publish ${tag}.`);
-console.log(`Pushing the tag will run verification, deploy WordPress.org, create the GitHub Release, and upload the ZIP.`);
+console.log(`Pushing the tag will run verification, deploy WordPress.org, create the GitHub Release, and upload both ZIPs.`);
 
 if (!(await confirm(`Create and push ${tag}?`))) {
-	console.log("Release cancelled. The local ZIP remains in .tmp/release/.");
+	console.log("Release cancelled. The local ZIPs remain in .tmp/release/.");
 	process.exit(0);
 }
 
