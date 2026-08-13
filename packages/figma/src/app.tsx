@@ -12,7 +12,12 @@ import "./style.scss";
 import { ColorVariable, Declaration, Preset, SimpleVariable } from "./types";
 import { generateFluidTypographyObjects } from "./typography/getFluidTypeVariables";
 import { footerLinks } from "./utils/footer";
-import { isMessageFromEditor, postMessageToIframe, postMessageToParent } from "./utils/frameMessaging";
+import {
+	getPluginMessage,
+	isMessageFromEditor,
+	postMessageToIframe,
+	postMessageToParent,
+} from "./utils/frameMessaging";
 
 // Sync variables to Figma - must be outside component to avoid stale closures
 function syncVariables(presetData: Preset, colorVariables: ColorVariable[]) {
@@ -116,7 +121,6 @@ function App() {
 			// Raw messages belong to the bundled editor iframe. Figma host messages
 			// arrive wrapped in event.data.pluginMessage.
 			if (event.data?.type && !isMessageFromEditor(event)) return;
-			if (event.data?.pluginMessage && event.source !== parent) return;
 
 			if (event.data.type === "figma-reopen") {
 				setPreset(null);
@@ -145,7 +149,12 @@ function App() {
 
 			// Handle messages from Figma main code (code.ts)
 			// This handler must be in app.tsx because SelectProjectSection unmounts after project loads
-			const pluginMessage = event.data?.pluginMessage;
+			const pluginMessage = getPluginMessage<{
+				type?: string;
+				error?: string;
+				preset?: Preset;
+				projectId?: string;
+			}>(event);
 			if (pluginMessage?.type === "wordpress-response") {
 				postMessageToIframe("cf-figma-wordpress-response", pluginMessage);
 			}

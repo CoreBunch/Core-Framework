@@ -7,7 +7,12 @@ import { generateSpacingObjects } from "../spacing/getFluidSpacingVariables";
 import { ColorVariable, Declaration, Preset, SimpleVariable } from "../types";
 import { generateFluidTypographyObjects } from "../typography/getFluidTypeVariables";
 import { devLog } from "../utils";
-import { isMessageFromEditor, postMessageToIframe, postMessageToParent } from "../utils/frameMessaging";
+import {
+	getPluginMessage,
+	isMessageFromEditor,
+	postMessageToIframe,
+	postMessageToParent,
+} from "../utils/frameMessaging";
 import { Card } from "./Card";
 
 interface SelectProjectSection {
@@ -174,9 +179,14 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 				};
 			}>,
 		) => {
-			if (event.data?.pluginMessage && event.source !== parent) return;
+			const pluginMessage = getPluginMessage<{
+				type?: string;
+				error?: string;
+				projectId?: string;
+				preset?: Preset;
+			}>(event);
+			if (!pluginMessage) return;
 
-			const pluginMessage = event?.data?.pluginMessage;
 			devLog("pluginMessage", pluginMessage);
 			switch (pluginMessage?.type) {
 				case "import-project": {
@@ -193,7 +203,7 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 					break;
 				}
 				case "get-project-id": {
-					const receivedApiKey = event.data.pluginMessage?.projectId;
+					const receivedApiKey = pluginMessage.projectId;
 
 					if (receivedApiKey) {
 						postMessageToIframe("cf-figma-set-api-key", { apiKey: receivedApiKey });
@@ -203,7 +213,7 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 					break;
 				}
 				case "get-project-locally": {
-					const preset = event.data.pluginMessage?.preset;
+					const preset = pluginMessage.preset;
 					if (preset) {
 						setLocalPreset(preset);
 					}
