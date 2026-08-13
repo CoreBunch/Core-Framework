@@ -65,6 +65,8 @@ const archivePath = join(RELEASE_DIR, `core-framework-figma-${version}.zip`);
 console.log(`Building Core Framework for Figma ${version} release...`);
 
 await run("bun", ["run", "build:figma"]);
+await run("bun", ["run", "scripts/check-open-source-boundaries.ts", "source"]);
+await run("bun", ["run", "scripts/check-open-source-boundaries.ts", "figma"]);
 
 const manifest = JSON.parse(await readFile(join(FIGMA_DIR, "manifest.json"), "utf8"));
 if (manifest.main !== "dist/code.js" || manifest.ui !== "dist/index.html") {
@@ -82,6 +84,13 @@ for (const entry of ["manifest.json", "README.md", "dist/code.js", "dist/index.h
 for (const file of ["LICENSE", "THIRD_PARTY_NOTICES.md"]) {
 	await copyReleaseEntry(file, file, ROOT);
 }
+
+await run("bun", [
+	"run",
+	"scripts/generate-third-party-licenses.ts",
+	"figma",
+	join(STAGING_DIR, "THIRD_PARTY_LICENSES.txt"),
+]);
 
 for (const forbiddenEntry of [".env", ".generated", "node_modules", "src"]) {
 	if (existsSync(join(STAGING_DIR, forbiddenEntry))) {

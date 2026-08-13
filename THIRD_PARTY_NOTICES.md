@@ -3,6 +3,8 @@
 Core Framework includes adapted sun and moon icons from Heroicons.
 It also includes an adapted PostCSS 8 implementation of postcss-easing-gradients.
 
+Release archives also contain a generated `THIRD_PARTY_LICENSES.txt` or `third-party-licenses.txt` with the production JavaScript and Composer dependency inventory and available license texts.
+
 ## Heroicons
 
 Source: https://github.com/tailwindlabs/heroicons

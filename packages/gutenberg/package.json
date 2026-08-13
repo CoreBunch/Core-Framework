@@ -13,6 +13,7 @@
 	"prettier": "../../.prettierrc.cjs",
 	"devDependencies": {
 		"@wordpress/block-editor": "^16.1.0",
+		"@wordpress/browserslist-config": "^6.53.0",
 		"@wordpress/components": "^38.0.0",
 		"@wordpress/compose": "^8.5.0",
 		"@wordpress/data": "^10.52.0",

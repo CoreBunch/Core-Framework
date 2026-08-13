@@ -160,15 +160,11 @@ class Functions extends Base {
 		$options_to_delete = array(
 			'main',
 			'db_version',
-			'free_license',
 			'selected_preset_backup',
 			'grouped_classes',
 			'colors',
 			'oxygen_css_helper',
-				'variables',
-				'bricks_license_key',
-				'oxygen_license_key',
-				'figma_license_key',
+			'variables',
 		);
 
 		foreach ( $options_to_delete as $option ) {

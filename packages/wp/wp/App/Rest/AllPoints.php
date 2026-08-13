@@ -245,7 +245,7 @@ class AllPoints extends Base {
 			$readonly_routes[ $key ] = '/core-framework/v2' . $value;
 		}
 
-		$nonce = $request->get_header( 'X-WP-Nonce' );
+		$nonce = (string) $request->get_header( 'X-WP-Nonce' );
 		return $this->permission( $nonce, in_array( $route, $readonly_routes, true ) );
 	}
 

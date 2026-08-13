@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-
 :root {
 	--primary: #5c68f9;
 	--primary-transparent: #5c69f938;
@@ -94,7 +92,7 @@
 	--radius-btn: 0.5rem;
 	--input-bg-primary: rgba(131, 131, 131, 0.35);
 
-	--font-family: "Inter", sans-serif;
+	--font-family: "Inter Variable", "Inter", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	--code-font: "Operator Mono", "Fira Code", Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
 
 	/* CUSTOMIZE */

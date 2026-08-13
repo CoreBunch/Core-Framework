@@ -84,6 +84,8 @@ await run("bun", ["run", "build:blocks"]);
 await run("composer", ["install", "--no-dev", "--prefer-dist", "--optimize-autoloader", "--no-interaction", "--no-progress"], WP_DIR);
 await run("bunx", ["tsc"], WP_DIR, { APP_ENV: "production" });
 await run("bunx", ["vite", "build"], WP_DIR, { APP_ENV: "production" });
+await run("bun", ["run", "scripts/check-open-source-boundaries.ts", "source"]);
+await run("bun", ["run", "scripts/check-open-source-boundaries.ts", "wp"]);
 
 await rm(STAGING_DIR, { recursive: true, force: true });
 await rm(archivePath, { force: true });
@@ -105,6 +107,13 @@ for (const file of [
 	await copyReleaseEntry(file);
 }
 
+await run("bun", [
+	"run",
+	"scripts/generate-third-party-licenses.ts",
+	"wp",
+	join(STAGING_DIR, "third-party-licenses.txt"),
+]);
+
 // Generated CSS belongs to each WordPress installation, never to the release.
 await rm(join(STAGING_DIR, "assets", "public", "css", "core_framework.css"), { force: true });
 await rm(join(STAGING_DIR, "assets", "public", "css", ".gitkeep"), { force: true });
@@ -112,11 +121,6 @@ await rm(join(STAGING_DIR, "assets", "public", "css", ".gitkeep"), { force: true
 // Composer archives can contain development metadata that is not part of the plugin.
 await rm(join(STAGING_DIR, "vendor", "bin", ".phpunit.result.cache"), { force: true });
 await rm(join(STAGING_DIR, "vendor", "composer", "installers", ".github"), { recursive: true, force: true });
-for (const dependency of ["internationalization", "requirements"]) {
-	for (const metadata of [".editorconfig", ".gitattributes", ".gitignore"]) {
-		await rm(join(STAGING_DIR, "vendor", "micropackage", dependency, metadata), { force: true });
-	}
-}
 
 const forbiddenEntries = [".env", "node_modules", "src", "Tests"];
 for (const entry of forbiddenEntries) {

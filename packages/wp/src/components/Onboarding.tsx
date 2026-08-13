@@ -1,15 +1,13 @@
-import { Dispatch, SetStateAction, memo, useCallback, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, memo, useEffect, useState } from "react";
 import { Select, Switch } from "@mantine/core";
 import clsx from "clsx";
-import { devLog } from "functions/devLog";
 import { preparePresetToLoad } from "functions/preparePresetToLoad";
 import { sanitizePreset } from "functions/sanitizePreset";
-import { validatePreset } from "functions/validatePreset";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useAtom } from "jotai/index";
 import { localPreferencesSchema } from "schema/preferences.schema";
 import { toast } from "sonner";
-import { decodeCompressedString, withDevTimeLogger } from "utils";
+import { withDevTimeLogger } from "utils";
 import { Addons } from "views/Addons";
 import { Plus } from "assets/icons/Plus.icon";
 import coreFrameworkLogo from "assets/logo_transparent.png";
@@ -25,7 +23,6 @@ import {
 	TYPOGRAPHY_INITIAL_STATE,
 } from "data/defaults";
 import { DEFAULT_PRESET, getBlankPreset, getMinimalPreset } from "data/presets";
-import { CORE_FILE_FORMAT } from "constants/coreFileName";
 import {
 	changeVariablesAtom,
 	fluidSpacingHelperResultsAtom,
@@ -38,13 +35,11 @@ import {
 } from "state";
 import { onboardingAllowCloseAtom } from "state/onboardingAtom";
 import { lastSavedStateAtom } from "state/saveAtom";
-import { Dropzone } from "./basic/Dropzone";
 import { Loader } from "./basic/Loader";
 import { generateFluidSpacingResult } from "./modules/spacing/functions/getFluidSpacingVariables";
 import { retrieveVariablesFromSpacingState } from "./modules/spacing/functions/retrieveVariablesFromSpacingState";
 import { generateFluidTypographyResult } from "./modules/typography/functions/getFluidTypeVariables";
 import { retrieveVariablesFromTypographyState } from "./modules/typography/functions/retrieveVariablesFromTypographyState";
-import { ImportUiKitProjectForm } from "./presetManager/ImportUiKitProject";
 import { Row } from "./ui/Row";
 
 const PresetCard = ({
@@ -91,7 +86,6 @@ const PRESET_CARDS = [
 
 type FormData = {
 	selectedPreset: 1 | 2 | 3;
-	selectPresetType: "default" | "file" | "uiKit";
 	rootFontSize: number;
 	isDarkMode: boolean;
 };
@@ -105,12 +99,9 @@ export const Onboarding = memo(({ setIsOnboarding }: IOnboarding) => {
 	const [step, setStep] = useState(1);
 	const [formData, setFormData] = useState<FormData>({
 		selectedPreset: 1,
-		selectPresetType: "default",
 		rootFontSize: 16,
 		isDarkMode: true,
 	});
-	const [tempPreset, setTempPreset] = useState<Preset | null>(null);
-	const [info, setInfo] = useState("");
 
 	const setCurrentPreset = useSetAtom(setCurrentPresetAtom);
 	const setLastSavedState = useSetAtom(lastSavedStateAtom);
@@ -166,45 +157,6 @@ export const Onboarding = memo(({ setIsOnboarding }: IOnboarding) => {
 			});
 		});
 	}
-
-	const onExternalPresetDrop = useCallback(async ([file]: File[]) => {
-		toast.promise(
-			new Promise(async (resolve, reject) => {
-				let preset: Preset;
-
-				try {
-					const json = file.name.endsWith(`.${CORE_FILE_FORMAT}`)
-						? decodeCompressedString(await file.text())
-						: await file.text();
-
-					preset = (await JSON.parse(json)) as Preset;
-				} catch (e) {
-					return reject("Invalid preset file");
-				}
-
-				const parseReturn = validatePreset(preset);
-
-				if (!parseReturn.success) {
-					devLog("Invalid preset file", parseReturn);
-					return reject("Invalid preset file");
-				}
-
-				const preparedPreset = preparePresetToLoad({
-					preset,
-				});
-
-				setTempPreset(preparedPreset);
-				setFormData((prev) => ({ ...prev, selectedPreset: 1, selectPresetType: "file" }));
-				setInfo("Selected project from file");
-				resolve(preparedPreset);
-			}),
-			{
-				loading: "Loading...",
-				success: "Loaded!",
-				error: "Failed to import project from file. Ensure the file is valid and try again.",
-			},
-		);
-	}, []);
 
 	async function loadDefaultPreset() {
 		if (isLoading) {
@@ -363,51 +315,21 @@ export const Onboarding = memo(({ setIsOnboarding }: IOnboarding) => {
 					{step === 1 ? (
 						<div className="">
 							<h2>1. How do you wish to start?</h2>
-							<div
-								className={clsx(
-									"preset-selector-container",
-									formData.selectPresetType === "default" && "selected",
-								)}
-							>
+							<div className="preset-selector-container selected">
 								{PRESET_CARDS.map((preset, index) => (
 									<PresetCard
 										key={preset.title}
 										{...preset}
 										onClick={() => {
-											setInfo("");
 											setFormData((prev) => ({
 												...prev,
 												selectedPreset: (index + 1) as 1 | 2 | 3,
-												selectedPresetType: "default",
 											}));
 										}}
-										isSelected={
-											formData.selectedPreset === ((index + 1) as 1 | 2 | 3) &&
-											formData.selectPresetType === "default"
-										}
+										isSelected={formData.selectedPreset === ((index + 1) as 1 | 2 | 3)}
 									/>
 								))}
 							</div>
-
-							{/* <div className="preset-selector-container external-presets-container">
-								<div
-									className={clsx("dropzone-container", formData.selectPresetType === "file" && "selected")}
-								>
-									<Dropzone onDrop={onExternalPresetDrop} />
-								</div>
-
-								<div
-									className={clsx("ui-kit-import-form", formData.selectPresetType === "uiKit" && "selected")}
-								>
-									<ImportUiKitProjectForm
-										setExternalPreset={(preset) => {
-											setFormData((prev) => ({ ...prev, selectedPreset: 1, selectPresetType: "uiKit" }));
-											setTempPreset(preset);
-											setInfo(`Selected project "${preset.name}"`);
-										}}
-									/>
-								</div>
-							</div> */}
 						</div>
 					) : null}
 
@@ -437,8 +359,7 @@ export const Onboarding = memo(({ setIsOnboarding }: IOnboarding) => {
 								</Row>
 							</div>
 
-							{formData.selectPresetType === "default" ? (
-								<div className="preference-row">
+							<div className="preference-row">
 									<Row label="Dark mode" htmlFor="is_dark_mode">
 										<Switch
 											onChange={({ target: { checked } }) =>
@@ -448,8 +369,7 @@ export const Onboarding = memo(({ setIsOnboarding }: IOnboarding) => {
 											id="is_dark_mode"
 										/>
 									</Row>
-								</div>
-							) : null}
+							</div>
 						</div>
 					) : null}
 				</div>
@@ -564,7 +484,7 @@ export const Onboarding = memo(({ setIsOnboarding }: IOnboarding) => {
 					</a>
 
 					<div className="right">
-						<p className="info">{info}</p>
+						<div />
 
 						{[2, 3].includes(step) && (
 							<button

@@ -38,13 +38,18 @@ The [Core Framework Marketplace](https://coreframework.com/marketplace) sells op
 
 = External services =
 
-Core Framework can communicate with external services when you explicitly use the related feature:
+Core Framework works without a Core Framework account or hosted Core Framework backend. It makes an external request only when an administrator selects, previews, or imports a Google-hosted font:
 
-* Google Fonts public endpoints are used to browse and load Google-hosted fonts. No Google API key is required.
-* Core Framework-hosted endpoints are used for opt-in project sharing, remote project import, and supported synchronization flows.
-* Direct Figma-to-WordPress synchronization connects to the WordPress site using a connection key created by a site administrator.
+* The bundled font catalog is local. Selecting or previewing a Google Font requests CSS from https://fonts.googleapis.com. Importing it also downloads font files from https://fonts.gstatic.com, after which WordPress serves the saved font files locally. Requests identify the selected font family and variants; as with any web request, Google receives connection information such as the site's IP address and user agent. No Google API key or Google account is required.
+* Google Terms of Service: https://policies.google.com/terms
+* Google Privacy Policy: https://policies.google.com/privacy
+* Direct Figma-to-WordPress synchronization connects the Figma plugin directly to the user's own WordPress site using a connection key created by a site administrator. Project data is not routed through Core Framework servers.
 
-Core Framework does not contact a licensing server and does not require account activation. See the [documentation](https://docs.coreframework.com/) for details about individual features.
+The plugin's administration interface, image previews, project storage, CSS generation, and included integrations do not load assets from Core Framework servers. Core Framework does not contact a licensing server and does not require account activation.
+
+= Licensing =
+
+Core Framework's original source code is licensed under the MIT License. Bundled dependencies retain their own open-source licenses. The release archive includes third-party-notices.txt for adapted source and artwork and third-party-licenses.txt for the complete production dependency inventory.
 
 == Installation ==
 

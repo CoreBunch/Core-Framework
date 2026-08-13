@@ -17,7 +17,7 @@
 		"jsx": "react-jsx",
 		"noImplicitAny": false,
 		"strictNullChecks": false,
-		"typeRoots": ["../../node_modules/@types", "../../node_modules/@figma"]
+		"typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
 	},
 	"include": ["src", "main/code.ts"],
 	"references": [{ "path": "./tsconfig.node.json" }]

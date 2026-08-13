@@ -47,7 +47,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@jest/globals": "^29.7.0",
+    "@jest/globals": "^30.4.1",
     "@total-typescript/ts-reset": "^0.4.2",
     "@types/chroma-js": "^2.4.5",
     "@types/react": "^18.3.31",

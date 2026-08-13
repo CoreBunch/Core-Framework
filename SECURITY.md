@@ -41,4 +41,10 @@ Out of scope:
 - reports against third-party builders, WordPress, Figma, Google Fonts, or hosting providers that do not involve Core Framework code
 - denial-of-service reports that only exhaust intentionally local resources without a realistic deployment impact
 
+## Dependency Audit Exception
+
+CI rejects new high- or critical-severity JavaScript dependency advisories. It temporarily allows `GHSA-jmr9-qjv8-65gv` in `extract-zip` because upstream has not published a patched release. The package is present only through the `@wordpress/scripts` Puppeteer browser-download tooling; Core Framework's release workflow does not invoke that path, and neither the WordPress nor Figma release archive contains the package.
+
+Remove the exception as soon as a compatible patched upstream release is available. Run `bun run audit:security` to reproduce the enforced audit locally.
+
 Maintainers will acknowledge valid private reports, assess their impact, and coordinate a fix and disclosure when appropriate.

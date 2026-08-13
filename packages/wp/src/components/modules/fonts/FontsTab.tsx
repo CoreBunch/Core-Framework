@@ -14,7 +14,7 @@ import {
 import { FontNotFound } from "@core-framework/core/components/modules/fonts/components/FontNotFound";
 import { FontsList } from "./components/FontsList";
 import { FontData, FontVariantData } from "@core-framework/core/components/modules/fonts/types";
-import { applyFontToStylesheet, blobToBase64, generateFontFaceCSS } from "./utils/utils";
+import { blobToBase64, generateFontFaceCSS } from "./utils/utils";
 
 enum Tabs {
 	USER_FONTS = "user_fonts",
@@ -36,17 +36,17 @@ export function FontsTab() {
 	}, []);
 
 	useEffect(() => {
-		fontsFormData.fonts.forEach((font: FontData) => {
-			if (font.category === "custom-font") {
-				const fontVariant = font.variants[0]?.id;
-				if (fontVariant) {
-					const fontFace = new FontFace(font.family, `url(${font.files[fontVariant]})`);
-					fontFace.load().then((loadedFont) => document.fonts.add(loadedFont));
-				}
-			} else {
-				applyFontToStylesheet(font.family);
-			}
-		});
+		const styleElements = fontsFormData.fonts
+			.filter((font: FontData) => font.cssPreview)
+			.map((font: FontData) => {
+				const styleElement = document.createElement("style");
+				styleElement.dataset.coreFrameworkFont = font.id;
+				styleElement.textContent = font.cssPreview;
+				document.head.appendChild(styleElement);
+				return styleElement;
+			});
+
+		return () => styleElements.forEach((styleElement) => styleElement.remove());
 	}, [fontsFormData.fonts]);
 
 	const saveFontToWp = async (font: FontData): Promise<void> => {

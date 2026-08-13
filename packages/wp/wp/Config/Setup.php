@@ -34,7 +34,7 @@ final class Setup {
 	/**
 	 * Remove credentials that belonged to the retired EDD licensing system.
 	 */
-	private static function remove_legacy_edd_options(): void {
+	private static function remove_retired_commercial_options(): void {
 		$legacy_options = array(
 			'core_framework_free_license',
 			'core_framework_bricks_license_key',
@@ -83,10 +83,6 @@ final class Setup {
 	 * @docs https://developer.wordpress.org/reference/functions/register_activation_hook/
 	 */
 	public static function activation( bool $network_wide ): void {
-		if ( ! \current_user_can( 'activate_plugins' ) ) {
-			return;
-		}
-
 		if ( $network_wide ) {
 			foreach ( \get_sites() as $site ) {
 				\switch_to_blog( $site->blog_id );
@@ -132,10 +128,6 @@ final class Setup {
 	 * @docs https://developer.wordpress.org/reference/functions/register_deactivation_hook/
 	 */
 	public static function deactivation(): void {
-		if ( ! \current_user_can( 'activate_plugins' ) ) {
-			return;
-		}
-
 		\flush_rewrite_rules();
 	}
 
@@ -145,10 +137,6 @@ final class Setup {
 	 * @docs https://developer.wordpress.org/reference/functions/register_uninstall_hook/
 	 */
 	public static function uninstall(): void {
-		if ( ! \current_user_can( 'activate_plugins' ) ) {
-			return;
-		}
-
 		$is_delete_data = get_option( 'core_framework_main' )['delete_data'] ?? false;
 
 		if ( $is_delete_data ) {
@@ -169,7 +157,7 @@ final class Setup {
 		if ( is_multisite() ) {
 			foreach ( \get_sites() as $site ) {
 				\switch_to_blog( $site->blog_id );
-				self::remove_legacy_edd_options();
+				self::remove_retired_commercial_options();
 
 				if ( get_transient( 'core_framework_updated' ) !== $installed_version ) {
 					if ( self::ensure_stylesheet() ) {
@@ -183,7 +171,7 @@ final class Setup {
 			return;
 		}
 
-		self::remove_legacy_edd_options();
+		self::remove_retired_commercial_options();
 
 		if ( get_transient( 'core_framework_updated' ) === $installed_version ) {
 			return;
