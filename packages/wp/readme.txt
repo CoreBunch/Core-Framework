@@ -74,4 +74,14 @@ No. The font browser uses Google's public, keyless font endpoints.
 
 == Changelog ==
 
-The project changelog is available in the [source repository](https://github.com/corebunch/core-framework/blob/main/CHANGELOG.md) and the [documentation](https://docs.coreframework.com/changelog/changelog).
+= 2.0.0 =
+
+* Released Core Framework as free and open-source software under the MIT License.
+* Included the Gutenberg, Bricks, Oxygen, and Figma integrations without license checks or paid feature gates.
+* Updated the Oxygen 6 integration for Oxygen 6.1 and newer. Sites using Oxygen 6.0 should update Oxygen before installing Core Framework 2.0.
+* Replaced the Google Fonts API-key integration with a bundled catalog and keyless public endpoints.
+* Replaced the shared Figma cloud credential with direct, site-scoped connection keys.
+* Moved generated CSS to WordPress uploads storage and preserved it when upgrading from Core Framework 1.10.4.
+* Removed retired EDD licensing options while preserving site projects, integration preferences, fonts, and Figma connections.
+
+The complete changelog is available in the [source repository](https://github.com/corebunch/core-framework/blob/main/CHANGELOG.md) and the [documentation](https://docs.coreframework.com/changelog/changelog).

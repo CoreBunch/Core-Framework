@@ -66,7 +66,12 @@ jobs:
         run: bun run build:figma
 
       - name: Build WordPress plugin
+        env:
+          APP_ENV: production
         run: bun run build:wp
+
+      - name: Verify WordPress production manifest
+        run: test -s packages/wp/dist/.vite/manifest.json
 
       - name: Verify open-source boundaries
         run: bun run check:open-source
