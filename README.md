@@ -314,7 +314,7 @@ The [Core Framework Marketplace](https://coreframework.com/marketplace) offers o
 
 Core Framework is built by a team focused on giving designers and developers powerful visual tools without taking away ownership of their work. We also build:
 
-- **[Motion.page](https://motion.page)** — a visual animation builder for WordPress with its own animation engine and SDK. It brings professional timelines, interactions, scroll effects, and responsive animation controls into a visual workflow, while providing an independent alternative to GSAP.
+- **[Motion.page](https://motion.page)** — a complete visual animation stack for the web, combining a desktop app, an SDK, and a WordPress plugin. Build professional timelines, interactions, scroll effects, and responsive animations visually, then use them on any website—not only WordPress—through Motion.page's independent animation engine and tooling.
 - **[Instatic](https://instatic.com)** — a free, full-featured, open-source alternative to Framer, Webflow, and WordPress. It is a self-hosted visual CMS for building and managing fast, content-driven websites. Explore the project at [instatic.com](https://instatic.com) or view the source on [GitHub](https://github.com/corebunch/instatic).
 
 ## Contributing

@@ -12,12 +12,10 @@ const rootpath = "./src";
 // TODO: Check for 'development' APP_ENV variable
 if (!process.env.APP_ENV) {
 	process.stdout.write(`  ${red("Missing: APP_ENV")}\n`);
-	fs.writeFile(".env", "APP_ENV='development'", { flag: "a" }, (err) => {
-		if (err) process.exit();
-	});
+	fs.writeFileSync(".env", "APP_ENV='development'\n", { flag: "a" });
 	process.stdout.write(`  ${green("Created: APP_ENV='development'")}\n`);
 	process.stdout.write(`  ${yellow("Please, start project again.")}\n`);
-	process.exit();
+	process.exit(1);
 }
 
 const { CERT_PATH, HOME: HOME_DIR, DEV_URL: HOST, DEV_PROTOCOL: PROTOCOL } = process.env;

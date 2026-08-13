@@ -9,7 +9,7 @@ Core Framework uses a tag-driven release process. A push to `main` never publish
 3. Commit the release changes to `main`.
 4. Create and push a semantic version tag such as `v2.0.0`.
 5. GitHub Actions verifies the repository and builds versioned WordPress and Figma release bundles.
-6. The protected `wordpress-org` environment deploys the WordPress bundle to WordPress.org.
+6. The `wordpress-org` environment deploys the WordPress bundle to WordPress.org.
 7. GitHub Actions creates the GitHub Release and uploads both ZIPs.
 
 The workflow never deletes or rewrites an existing WordPress.org tag.
@@ -62,4 +62,4 @@ Create a protected environment named `wordpress-org` and add:
 - `SVN_USERNAME`
 - `SVN_PASSWORD`
 
-Require maintainer approval for that environment. The workflow uses the repository `GITHUB_TOKEN` to create the GitHub Release; no separate GitHub token is needed.
+For a multi-maintainer repository, consider requiring approval for this environment before deployment. In the current single-maintainer setup, possession of repository tag-push access is the release gate. The workflow uses the repository `GITHUB_TOKEN` to create the GitHub Release; no separate GitHub token is needed.
