@@ -122,8 +122,24 @@ class Functions extends Base {
 	 * @since 0.0.1
 	 */
 	public function refresh_selectors( $new_core_selectors_array ): array {
-		$bricks_classes        = get_option( self::BRICKS_CLASSES_OPTION, array() );
-		$bricks_locked_classes = get_option( self::BRICKS_LOCKED_CLASSES_OPTION, array() );
+		$bricks_classes           = get_option( self::BRICKS_CLASSES_OPTION, array() );
+		$bricks_locked_classes    = get_option( self::BRICKS_LOCKED_CLASSES_OPTION, array() );
+		$new_core_selectors_array = is_array( $new_core_selectors_array )
+			? array_values(
+				array_unique(
+					array_filter(
+						array_map(
+							fn( $class ): string => is_string( $class ) ? trim( $class ) : '',
+							$new_core_selectors_array
+						),
+						fn( $class ): bool => '' !== $class
+					)
+				)
+			)
+			: array();
+
+		$bricks_classes        = is_array( $bricks_classes ) ? $bricks_classes : array();
+		$bricks_locked_classes = is_array( $bricks_locked_classes ) ? $bricks_locked_classes : array();
 
 		$splitted_array = array(
 			'core'   => array(),
@@ -131,7 +147,11 @@ class Functions extends Base {
 		);
 
 		foreach ( $bricks_classes as $class ) {
-			if ( str_ends_with( $class['id'], self::CORE_SUFFIX ) ) {
+			$is_core_class = isset( $class['id'], $class['name'] )
+				&& str_ends_with( $class['id'], self::CORE_SUFFIX )
+				&& self::CORE_VARIABLE_CATEGORY === ( $class['category'] ?? '' );
+
+			if ( $is_core_class ) {
 				$splitted_array['core'][] = $class;
 				continue;
 			}
@@ -142,24 +162,46 @@ class Functions extends Base {
 		$core_prev_classes   = $splitted_array['core'];
 		$others_prev_classes = $splitted_array['others'];
 
-		$core_prev_classes = array_filter( $core_prev_classes, fn( $class ): bool => in_array( $class['name'], $new_core_selectors_array ) );
+		$locked_classes_to_remove = array_column(
+			array_filter(
+				$core_prev_classes,
+				fn( $class ): bool => ! in_array( $class['name'], $new_core_selectors_array, true )
+			),
+			'id'
+		);
+		$core_prev_classes        = array_filter(
+			$core_prev_classes,
+			fn( $class ): bool => in_array( $class['name'], $new_core_selectors_array, true )
+		);
+		$bricks_locked_classes    = array_filter(
+			$bricks_locked_classes,
+			fn( $class ): bool => ! in_array( $class, $locked_classes_to_remove, true )
+		);
 
-		$locked_classes_to_remove = array_column( array_filter( $core_prev_classes, fn( $class ): bool => ! in_array( $class['name'], $new_core_selectors_array ) ), 'id' );
-		$bricks_locked_classes    = array_filter( $bricks_locked_classes, fn( $class ): bool => ! in_array( $class, $locked_classes_to_remove ) );
+		$this->remove_class_references( $locked_classes_to_remove );
 
 		foreach ( $new_core_selectors_array as $new_core_selector_array ) {
-			if ( in_array( $new_core_selector_array, array_column( $core_prev_classes, 'name' ) ) ) {
+			if ( in_array( $new_core_selector_array, array_column( $core_prev_classes, 'name' ), true ) ) {
 				continue;
 			}
 
-			$id                      = $new_core_selector_array === 'z--1' ? 'z--1_c' : sanitize_title( $new_core_selector_array ) . self::CORE_SUFFIX;
-			$core_prev_classes[]     = array(
+			$sanitized_selector = sanitize_title( $new_core_selector_array );
+
+			if ( '' === $sanitized_selector ) {
+				continue;
+			}
+
+			$id                  = $new_core_selector_array === 'z--1' ? 'z--1_c' : $sanitized_selector . self::CORE_SUFFIX;
+			$core_prev_classes[] = array(
 				'name'     => $new_core_selector_array,
 				'id'       => $id,
 				'settings' => array(),
-				'category' => 'corefrm',
+				'category' => self::CORE_VARIABLE_CATEGORY,
 			);
-			$bricks_locked_classes[] = $id;
+
+			if ( ! in_array( $id, $bricks_locked_classes, true ) ) {
+				$bricks_locked_classes[] = $id;
+			}
 		}
 
 		$all = array( ...$others_prev_classes, ...$core_prev_classes );
@@ -168,6 +210,101 @@ class Functions extends Base {
 		update_option( self::BRICKS_LOCKED_CLASSES_OPTION, array_values( $bricks_locked_classes ), false );
 
 		return array( 'status' => 'success' );
+	}
+
+	/**
+	 * Remove deleted Core Framework class IDs from Bricks element settings.
+	 *
+	 * @param string[] $class_ids Removed Core Framework class IDs.
+	 */
+	private function remove_class_references( array $class_ids ): void {
+		if ( empty( $class_ids ) ) {
+			return;
+		}
+
+		$meta_keys = array(
+			defined( 'BRICKS_DB_PAGE_HEADER' ) ? constant( 'BRICKS_DB_PAGE_HEADER' ) : '_bricks_page_header_2',
+			defined( 'BRICKS_DB_PAGE_CONTENT' ) ? constant( 'BRICKS_DB_PAGE_CONTENT' ) : '_bricks_page_content_2',
+			defined( 'BRICKS_DB_PAGE_FOOTER' ) ? constant( 'BRICKS_DB_PAGE_FOOTER' ) : '_bricks_page_footer_2',
+			defined( 'BRICKS_DB_PAGE_SETTINGS' ) ? constant( 'BRICKS_DB_PAGE_SETTINGS' ) : '_bricks_page_settings',
+			defined( 'BRICKS_DB_TEMPLATE_SETTINGS' ) ? constant( 'BRICKS_DB_TEMPLATE_SETTINGS' ) : '_bricks_template_settings',
+		);
+
+		$meta_query = array( 'relation' => 'OR' );
+		foreach ( $meta_keys as $meta_key ) {
+			$meta_query[] = array(
+				'key'     => $meta_key,
+				'compare' => 'EXISTS',
+			);
+		}
+
+		$post_ids = get_posts(
+			array(
+				'post_type'              => array_values( get_post_types( array(), 'names' ) ),
+				'post_status'            => 'any',
+				'posts_per_page'         => -1,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'suppress_filters'       => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'meta_query'             => $meta_query,
+			)
+		);
+
+		foreach ( $post_ids as $post_id ) {
+			foreach ( $meta_keys as $meta_key ) {
+				$settings = get_post_meta( $post_id, $meta_key, true );
+
+				if ( ! is_array( $settings ) ) {
+					continue;
+				}
+
+				$updated_settings = $this->remove_class_references_from_settings( $settings, $class_ids );
+				if ( $updated_settings !== $settings ) {
+					update_post_meta( $post_id, $meta_key, $updated_settings );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Recursively remove class IDs only from Bricks' global-class setting.
+	 *
+	 * @param array    $settings Bricks settings or element data.
+	 * @param string[] $class_ids Removed Core Framework class IDs.
+	 * @return array
+	 */
+	private function remove_class_references_from_settings( array $settings, array $class_ids ): array {
+		foreach ( $settings as $key => $value ) {
+			if ( '_cssGlobalClasses' === $key ) {
+				if ( is_array( $value ) ) {
+					$settings[ $key ] = array_values(
+						array_filter(
+							$value,
+							fn( $class_id ): bool => ! in_array( $class_id, $class_ids, true )
+						)
+					);
+				} elseif ( is_string( $value ) ) {
+					$class_references = preg_split( '/\s+/', trim( $value ) ) ?: array();
+					$settings[ $key ] = implode(
+						' ',
+						array_filter(
+							$class_references,
+							fn( $class_id ): bool => ! in_array( $class_id, $class_ids, true )
+						)
+					);
+				}
+
+				continue;
+			}
+
+			if ( is_array( $value ) ) {
+				$settings[ $key ] = $this->remove_class_references_from_settings( $value, $class_ids );
+			}
+		}
+
+		return $settings;
 	}
 
 	public function refresh_variables(): array {
@@ -207,7 +344,7 @@ class Functions extends Base {
 			$current_variables
 		);
 
-		$others_variables  = array_filter( $bricks_variables, fn( $variable ): bool => $variable['category'] !== self::CORE_VARIABLE_CATEGORY );
+		$others_variables  = array_filter( $bricks_variables, fn( $variable ): bool => ( $variable['category'] ?? '' ) !== self::CORE_VARIABLE_CATEGORY );
 		$all_new_variables = array( ...$others_variables, ...$new_core_variables );
 
 		update_option( self::BRICKS_VARIABLES_OPTION, array_values( $all_new_variables ), false );

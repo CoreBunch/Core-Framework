@@ -243,7 +243,7 @@ export async function updateColors({ addonEnableArray, colors }: IUpdateColors) 
 }
 
 interface IUpdateClasses {
-	readonly classes: string;
+	readonly classes: string[];
 	readonly addonEnableArray: {
 		addon: "bricks" | "oxygen" | "gutenberg" | "";
 		enabled: boolean;

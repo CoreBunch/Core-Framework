@@ -174,13 +174,9 @@ export function usePush() {
 			});
 		}
 
-		if (!classAccumulator.length) {
-			return;
-		}
-
 		await Promise.allSettled([
 			updateClasses({
-				classes: [...new Set(classAccumulator)].join(","),
+				classes: [...new Set(classAccumulator)],
 				addonEnableArray,
 			}),
 		]);
@@ -669,13 +665,6 @@ export function usePush() {
 			}),
 		]);
 
-		await withDevTimeLogger(handleClassesRefresh)({
-			cssObjects,
-			classPrefix: latestPreset.classPrefix,
-			preset: latestPreset,
-			addonEnableArray,
-		});
-
 		responses.forEach((response) => {
 			if (response.status === "rejected") {
 				console.warn(response.reason);
@@ -683,6 +672,18 @@ export function usePush() {
 		});
 
 		const mainTableResponse = responses[1];
+		const stylesheetWasPersisted =
+			mainTableResponse.status === "fulfilled" && mainTableResponse.value.success;
+
+		if (stylesheetWasPersisted) {
+			await withDevTimeLogger(handleClassesRefresh)({
+				cssObjects,
+				classPrefix: latestPreset.classPrefix,
+				preset: latestPreset,
+				addonEnableArray,
+			});
+		}
+
 		const t2_total = performance.now();
 		const bytesSaved = mainTableResponse.status === "fulfilled" ? mainTableResponse.value.bytes_saved : 0;
 		const totalTime = t2_total - t1_total;
@@ -692,7 +693,7 @@ export function usePush() {
 			"Saved CSS size": [humanFileSize(bytesSaved)],
 		});
 
-		if (withToast) {
+		if (withToast && stylesheetWasPersisted) {
 			toast.success(
 				addonEnableArray.some(({ enabled }) => enabled)
 					? "Successfully pushed and synced."
