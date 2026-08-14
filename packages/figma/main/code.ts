@@ -1,27 +1,15 @@
 import { SimpleVariable } from "../src/types";
+import { parseHttpUrl, parseWordPressConnectionKey } from "./wordpressConnection";
 
 const PRESET_API_KEY_STORAGE_KEY = "cf_plugin_project_api_key";
 const PRESET_LOCAL_STORAGE_KEY = "cf_plugin_project_local";
-
-function parseWordPressConnectionKey(connectionKey: string) {
-	if (connectionKey.length <= 24) return null;
-
-	try {
-		const siteUrl = new URL(decodeURIComponent(connectionKey.slice(24)));
-		if (!["https:", "http:"].includes(siteUrl.protocol)) return null;
-
-		return { connectionKey, siteUrl: siteUrl.origin };
-	} catch {
-		return null;
-	}
-}
 
 async function fetchPreset(connectionKey: string) {
 	const connection = parseWordPressConnectionKey(connectionKey);
 	if (!connection) throw new Error("Invalid WordPress connection key");
 
-	const endpoint = new URL("/wp-json/core-framework/v2/preset", connection.siteUrl);
-	const response = await fetch(endpoint.toString(), {
+	const endpoint = `${connection.siteUrl}/wp-json/core-framework/v2/preset`;
+	const response = await fetch(endpoint, {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
@@ -76,20 +64,19 @@ async function handleWordPressRequest(msg: {
 }) {
 	try {
 		const connection = await getWordPressConnection();
-		const target = new URL(msg.url);
-		const connectedSite = connection ? new URL(connection.siteUrl) : null;
+		const target = parseHttpUrl(msg.url);
 
 		if (
 			!connection ||
-			!connectedSite ||
-			target.origin !== connectedSite.origin ||
+			!target ||
+			target.origin !== connection.siteUrl ||
 			!ALLOWED_WORDPRESS_PATHS.has(target.pathname) ||
 			!["GET", "POST", "PUT"].includes(msg.method)
 		) {
 			throw new Error("Blocked WordPress request");
 		}
 
-		const response = await fetch(target.toString(), {
+		const response = await fetch(target.href, {
 			method: msg.method,
 			headers: {
 				"Content-Type": "application/json",
