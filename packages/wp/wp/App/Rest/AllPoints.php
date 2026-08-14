@@ -71,7 +71,24 @@ class AllPoints extends Base {
 
 		if ( class_exists( 'WP_REST_Server' ) ) {
 			\add_action( 'rest_api_init', array( $this, 'add_plugin_rest_api' ) );
+			\add_filter( 'rest_allowed_cors_headers', array( $this, 'allow_figma_connection_header' ) );
 		}
+	}
+
+	/**
+	 * Allow the authentication header used by the Figma plugin.
+	 *
+	 * Figma plugin requests use a null origin and trigger a CORS preflight.
+	 * WordPress allows that origin by default, but custom request headers must
+	 * be added to the REST API allowlist explicitly.
+	 *
+	 * @param string[] $allow_headers REST request headers allowed by CORS.
+	 * @return string[]
+	 */
+	public function allow_figma_connection_header( array $allow_headers ): array {
+		$allow_headers[] = 'X-Core-Framework-Key';
+
+		return array_values( array_unique( $allow_headers ) );
 	}
 
 	/**
