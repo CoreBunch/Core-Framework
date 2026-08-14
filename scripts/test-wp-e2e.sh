@@ -114,6 +114,8 @@ wp_cli core install \
 	--admin_email=e2e@example.test \
 	--skip-email
 
+wp_cli rewrite structure '/%postname%/' --hard
+
 for option_name in \
 	core_framework_free_license \
 	core_framework_bricks_license_key \
@@ -224,6 +226,22 @@ if ($deleted->is_error() || get_option("core_framework_api_key", "") !== "") {
 
 WP_CLI::success("REST authorization and Figma connection-key lifecycle passed.");
 '
+
+FIGMA_PREFLIGHT_HEADERS="$(curl --fail --silent --show-error --dump-header - --output /dev/null \
+	--request OPTIONS "$SITE_URL/wp-json/core-framework/v2/preset" \
+	--header 'Origin: null' \
+	--header 'Access-Control-Request-Method: GET' \
+	--header 'Access-Control-Request-Headers: content-type,x-core-framework-key')"
+
+if ! grep -Eqi '^Access-Control-Allow-Origin:[[:space:]]*null' <<<"$FIGMA_PREFLIGHT_HEADERS"; then
+	echo "The Figma REST preflight did not allow Figma's null origin." >&2
+	exit 1
+fi
+
+if ! grep -Eqi '^Access-Control-Allow-Headers:.*X-Core-Framework-Key' <<<"$FIGMA_PREFLIGHT_HEADERS"; then
+	echo "The Figma REST preflight did not allow the X-Core-Framework-Key header." >&2
+	exit 1
+fi
 
 wp_cli plugin deactivate core-framework --quiet
 [[ "$(wp_cli plugin get core-framework --field=status)" == "inactive" ]]
