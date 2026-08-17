@@ -86,6 +86,22 @@ if ( ! function_exists( 'update_post_meta' ) ) {
 	}
 }
 
+if ( ! function_exists( 'update_meta_cache' ) ) {
+	function update_meta_cache( $meta_type, $object_ids ) {
+		$GLOBALS['cf_test_meta_primes'][] = $object_ids;
+		// Captured here so a test can assert the class list is already durable by the
+		// time element references are swept.
+		$GLOBALS['cf_test_sweep_classes'] = $GLOBALS['cf_test_options']['bricks_global_classes'] ?? null;
+		return array();
+	}
+}
+
+if ( ! function_exists( 'wp_cache_delete' ) ) {
+	function wp_cache_delete( $key, $group = '' ) {
+		return true;
+	}
+}
+
 if ( ! function_exists( 'sanitize_title' ) ) {
 	function sanitize_title( $title ) {
 		$title = strtolower( trim( (string) $title ) );
@@ -171,6 +187,8 @@ final class BricksSynchronizationTest extends TestCase {
 		);
 		$GLOBALS['cf_test_post_meta']      = array();
 		$GLOBALS['cf_test_mutations']      = 0;
+		$GLOBALS['cf_test_meta_primes']    = array();
+		$GLOBALS['cf_test_sweep_classes']  = null;
 		$GLOBALS['cf_test_stylesheet']     = '';
 		$GLOBALS['cf_test_bricks_builder'] = new CoreFrameworkTestBuilder( true );
 		$GLOBALS['cf_test_oxygen_builder'] = new CoreFrameworkTestBuilder( false );
@@ -354,6 +372,69 @@ final class BricksSynchronizationTest extends TestCase {
 
 		$this->assertSame( array(), $GLOBALS['cf_test_options'][ BricksFunctions::BRICKS_CLASSES_OPTION ] );
 		$this->assertSame( array(), $GLOBALS['cf_test_options'][ BricksFunctions::BRICKS_LOCKED_CLASSES_OPTION ] );
+	}
+
+	public function testSelectorsThatSanitizeToTheSameIdProduceOneClass(): void {
+		$GLOBALS['cf_test_options'][ BricksFunctions::BRICKS_CLASSES_OPTION ]        = array();
+		$GLOBALS['cf_test_options'][ BricksFunctions::BRICKS_LOCKED_CLASSES_OPTION ] = array();
+
+		// Both names sanitize to 'text-lg'. Bricks keys elements by class id, so emitting
+		// two classes sharing 'text-lg_c' would make which one applies arbitrary.
+		$this->createBricksFunctions()->refresh_selectors( array( 'text lg', 'text.lg' ) );
+
+		$classes = $GLOBALS['cf_test_options'][ BricksFunctions::BRICKS_CLASSES_OPTION ];
+
+		$this->assertSame( array( 'text-lg_c' ), array_column( $classes, 'id' ) );
+		$this->assertSame(
+			array( 'text-lg_c' ),
+			$GLOBALS['cf_test_options'][ BricksFunctions::BRICKS_LOCKED_CLASSES_OPTION ]
+		);
+	}
+
+	public function testReferenceSweepIsBatchedAndRunsAfterClassesArePersisted(): void {
+		$GLOBALS['cf_test_options'][ BricksFunctions::BRICKS_CLASSES_OPTION ] = array(
+			array(
+				'id'       => 'padding_c',
+				'name'     => 'padding',
+				'settings' => array(),
+				'category' => BricksFunctions::CORE_VARIABLE_CATEGORY,
+			),
+		);
+		$GLOBALS['cf_test_options'][ BricksFunctions::BRICKS_LOCKED_CLASSES_OPTION ] = array( 'padding_c' );
+
+		for ( $post_id = 1; $post_id <= 120; $post_id++ ) {
+			$GLOBALS['cf_test_post_meta'][ $post_id ] = array(
+				'_bricks_page_content_2' => array(
+					array(
+						'id'       => 'element-' . $post_id,
+						'settings' => array( '_cssGlobalClasses' => array( 'padding_c', 'keep-me' ) ),
+					),
+				),
+			);
+		}
+
+		$this->createBricksFunctions()->refresh_selectors( array() );
+
+		// 120 posts at a chunk size of 50 is three primed batches. Without priming, each
+		// post would cost one uncached read per Bricks meta key instead.
+		$this->assertSame(
+			array( 50, 50, 20 ),
+			array_map( 'count', $GLOBALS['cf_test_meta_primes'] )
+		);
+
+		// The sweep is destructive and slow, so the class list must already be durable
+		// when it starts. Otherwise an interrupted sweep strips references from elements
+		// while the classes still exist, and nothing recovers from that.
+		$this->assertSame(
+			array(),
+			array_column( $GLOBALS['cf_test_sweep_classes'], 'id' ),
+			'classes must be persisted before element references are swept'
+		);
+
+		$this->assertSame(
+			array( 'keep-me' ),
+			$GLOBALS['cf_test_post_meta'][120]['_bricks_page_content_2'][0]['settings']['_cssGlobalClasses']
+		);
 	}
 
 	public function testVariableSynchronizationPreservesNonCoreVariablesAndCategories(): void {

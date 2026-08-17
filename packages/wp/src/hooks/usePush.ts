@@ -657,12 +657,6 @@ export function usePush() {
 				maxScreenWidth: max_screen_width,
 				enabled: Boolean(isOxygenEnabled),
 			}),
-			withDevTimeLogger(handleColorsRefresh)({
-				classPrefix: latestPreset.classPrefix,
-				variablePrefix: latestPreset.variablePrefix,
-				preset: latestPreset,
-				addonEnableArray,
-			}),
 		]);
 
 		responses.forEach((response) => {
@@ -676,6 +670,22 @@ export function usePush() {
 			mainTableResponse.status === "fulfilled" && mainTableResponse.value.success;
 
 		if (stylesheetWasPersisted) {
+			// Colors used to refresh inside the batch above, so they reached the builder
+			// even when the stylesheet never persisted. They belong behind the same gate
+			// as the classes, and still ahead of them, which is the order the batch gave.
+			const [colorsSync] = await Promise.allSettled([
+				withDevTimeLogger(handleColorsRefresh)({
+					classPrefix: latestPreset.classPrefix,
+					variablePrefix: latestPreset.variablePrefix,
+					preset: latestPreset,
+					addonEnableArray,
+				}),
+			]);
+
+			if (colorsSync.status === "rejected") {
+				console.warn(colorsSync.reason);
+			}
+
 			await withDevTimeLogger(handleClassesRefresh)({
 				cssObjects,
 				classPrefix: latestPreset.classPrefix,
@@ -693,12 +703,18 @@ export function usePush() {
 			"Saved CSS size": [humanFileSize(bytesSaved)],
 		});
 
-		if (withToast && stylesheetWasPersisted) {
-			toast.success(
-				addonEnableArray.some(({ enabled }) => enabled)
-					? "Successfully pushed and synced."
-					: "Successfully pushed.",
-			);
+		if (withToast) {
+			if (stylesheetWasPersisted) {
+				toast.success(
+					addonEnableArray.some(({ enabled }) => enabled)
+						? "Successfully pushed and synced."
+						: "Successfully pushed.",
+				);
+			} else {
+				// Without this the push is completely silent when the stylesheet fails to
+				// persist: no success, no error, nothing. Save is the primary action here.
+				toast.error("Failed to save. Your changes were not applied.");
+			}
 		}
 
 		// Store the current state as the last saved state with sorted keys for consistent comparison

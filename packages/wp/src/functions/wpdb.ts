@@ -114,8 +114,10 @@ export async function handlePushDb({ id, cssString }: IHandlePush) {
 			...parsed.data,
 		};
 	} catch (e) {
-		console.warn(ERROR_MESSAGE);
-		toast.error("Failed to update preset");
+		// The caller decides what the user sees: it is the only place that knows whether
+		// this push was meant to be silent, and it now reports the failure for both this
+		// branch and the parse branch above, which never had a message at all.
+		console.warn(ERROR_MESSAGE, e);
 		return {
 			success: false,
 			bytes_saved: 0,

@@ -100,6 +100,17 @@ class Functions extends Base {
 	public const CORE_COLOR_PALETTE_NAME = 'Core Framework';
 
 	/**
+	 * How many posts to prime and process per batch when sweeping class references.
+	 *
+	 * Bricks page content is stored as one large serialized array per post, so priming
+	 * every post at once would trade query count for memory. 50 keeps both bounded.
+	 *
+	 * @since 0.0.1
+	 * @var int
+	 */
+	private const REFERENCE_SWEEP_CHUNK_SIZE = 50;
+
+	/**
 	 * Initialize the class.
 	 *
 	 * @since 0.0.1
@@ -178,8 +189,6 @@ class Functions extends Base {
 			fn( $class ): bool => ! in_array( $class, $locked_classes_to_remove, true )
 		);
 
-		$this->remove_class_references( $locked_classes_to_remove );
-
 		foreach ( $new_core_selectors_array as $new_core_selector_array ) {
 			if ( in_array( $new_core_selector_array, array_column( $core_prev_classes, 'name' ), true ) ) {
 				continue;
@@ -191,7 +200,15 @@ class Functions extends Base {
 				continue;
 			}
 
-			$id                  = $new_core_selector_array === 'z--1' ? 'z--1_c' : $sanitized_selector . self::CORE_SUFFIX;
+			$id = $new_core_selector_array === 'z--1' ? 'z--1_c' : $sanitized_selector . self::CORE_SUFFIX;
+
+			// Distinct selector names can sanitize to the same slug, and Bricks keys
+			// elements by class id. Emitting both would put two classes with one id in
+			// the option, making which of them applies arbitrary.
+			if ( in_array( $id, array_column( $core_prev_classes, 'id' ), true ) ) {
+				continue;
+			}
+
 			$core_prev_classes[] = array(
 				'name'     => $new_core_selector_array,
 				'id'       => $id,
@@ -208,6 +225,13 @@ class Functions extends Base {
 
 		update_option( self::BRICKS_CLASSES_OPTION, array_values( $all ), false );
 		update_option( self::BRICKS_LOCKED_CLASSES_OPTION, array_values( $bricks_locked_classes ), false );
+
+		// Sweep element references only once the class list itself is durable. Running
+		// the sweep first means a request that dies partway through leaves elements
+		// stripped of their class references while the classes still exist, which
+		// nothing recovers from. This order fails the other way: stale references
+		// survive and the next synchronization removes them.
+		$this->remove_class_references( $locked_classes_to_remove );
 
 		return array( 'status' => 'success' );
 	}
@@ -252,18 +276,28 @@ class Functions extends Base {
 			)
 		);
 
-		foreach ( $post_ids as $post_id ) {
-			foreach ( $meta_keys as $meta_key ) {
-				$settings = get_post_meta( $post_id, $meta_key, true );
+		// 'fields' => 'ids' means WP_Query never primes the meta cache, so without this
+		// every get_post_meta below is its own query: five per post, 25k on a 5k-post
+		// site. Priming per chunk costs one query per chunk instead, while bounding how
+		// much Bricks page content is held in memory at once.
+		foreach ( array_chunk( $post_ids, self::REFERENCE_SWEEP_CHUNK_SIZE ) as $post_id_chunk ) {
+			update_meta_cache( 'post', $post_id_chunk );
 
-				if ( ! is_array( $settings ) ) {
-					continue;
+			foreach ( $post_id_chunk as $post_id ) {
+				foreach ( $meta_keys as $meta_key ) {
+					$settings = get_post_meta( $post_id, $meta_key, true );
+
+					if ( ! is_array( $settings ) ) {
+						continue;
+					}
+
+					$updated_settings = $this->remove_class_references_from_settings( $settings, $class_ids );
+					if ( $updated_settings !== $settings ) {
+						update_post_meta( $post_id, $meta_key, $updated_settings );
+					}
 				}
 
-				$updated_settings = $this->remove_class_references_from_settings( $settings, $class_ids );
-				if ( $updated_settings !== $settings ) {
-					update_post_meta( $post_id, $meta_key, $updated_settings );
-				}
+				wp_cache_delete( $post_id, 'post_meta' );
 			}
 		}
 	}
