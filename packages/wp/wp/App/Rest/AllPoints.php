@@ -26,6 +26,15 @@ use CoreFramework\StylesheetStorage;
  */
 class AllPoints extends Base {
 	/**
+	 * Public, read-only endpoint serving projects their owner marked as public.
+	 * Fixed here on purpose: the REST route accepts a project ID, never a URL.
+	 */
+	private const REMOTE_IMPORT_ENDPOINT = 'https://us-central1-core-framework-6bdc9.cloudfunctions.net/getPreset';
+
+	/** Generous ceiling for a single project payload, guarding against a runaway response. */
+	private const REMOTE_IMPORT_MAX_BYTES = 8388608;
+
+	/**
 	 * Initialize the WordPress filesystem API.
 	 *
 	 * @return \WP_Filesystem_Base|null
@@ -349,6 +358,16 @@ class AllPoints extends Base {
 			array(
 				'methods' 						=> \WP_REST_Server::READABLE,
 				'callback' 						=> array( $this, 'get_core_fonts' ),
+				'permission_callback' => array( $this, 'verify_nonce' ),
+			)
+		);
+
+		register_rest_route(
+			CORE_FRAMEWORK_NAME . '/v2',
+			'/remote-import',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'remote_import' ),
 				'permission_callback' => array( $this, 'verify_nonce' ),
 			)
 		);
@@ -821,6 +840,67 @@ class AllPoints extends Base {
 			: array();
 
 		return ['success' => true, 'fonts' => $preset_fonts];
+	}
+
+	/**
+	 * Fetch a publicly shared Core Framework project by its ID.
+	 *
+	 * The request is made from the server, so the administrator's browser never
+	 * contacts a third-party host. The target URL is fixed here and the ID is
+	 * validated against the ULID alphabet before use, so no caller-supplied URL
+	 * is ever requested.
+	 *
+	 * @since 2.0.1
+	 * @param \WP_REST_Request $request { id: string }
+	 * @return array
+	 */
+	public function remote_import( \WP_REST_Request $request ) {
+		$id = strtoupper( trim( (string) ( $request->get_param( 'id' ) ?? '' ) ) );
+
+		if ( ! preg_match( '/^[0-9A-HJKMNP-TV-Z]{26}$/', $id ) ) {
+			return array( 'success' => false, 'reason' => 'invalid-id' );
+		}
+
+		$response = \wp_remote_get(
+			self::REMOTE_IMPORT_ENDPOINT . '?id=' . rawurlencode( $id ),
+			array(
+				'timeout'     => 15,
+				'redirection' => 0,
+				'user-agent'  => 'CoreFramework/' . CORE_FRAMEWORK_VERSION,
+			)
+		);
+
+		if ( \is_wp_error( $response ) ) {
+			return array( 'success' => false, 'reason' => 'request-failed' );
+		}
+
+		$code = \wp_remote_retrieve_response_code( $response );
+
+		if ( 200 !== $code ) {
+			return array(
+				'success' => false,
+				'reason'  => 404 === $code ? 'not-found' : 'request-failed',
+			);
+		}
+
+		$body = \wp_remote_retrieve_body( $response );
+
+		if ( strlen( $body ) > self::REMOTE_IMPORT_MAX_BYTES ) {
+			return array( 'success' => false, 'reason' => 'request-failed' );
+		}
+
+		$decoded = json_decode( $body, true );
+
+		if (
+			! is_array( $decoded )
+			|| empty( $decoded['success'] )
+			|| ! isset( $decoded['data']['json'] )
+			|| ! is_string( $decoded['data']['json'] )
+		) {
+			return array( 'success' => false, 'reason' => 'not-found' );
+		}
+
+		return array( 'success' => true, 'json' => $decoded['data']['json'] );
 	}
 
 	/**

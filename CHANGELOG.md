@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Restored remote project import from a shareable link or a project ID. Preparing 2.0.0 for open source removed the importer's client-side credential, which left the request failing, and the unusable input was then deleted — taking a working feature and every shared link with it.
+
+### Changed
+
+- WordPress now retrieves a shared project through the plugin's own REST route rather than from the administrator's browser, so the request leaves the server and no third-party host is contacted by the admin screen.
+
 ## [2.0.0] - 2026-08-12
 
 ### Changed

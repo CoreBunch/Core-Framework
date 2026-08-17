@@ -38,14 +38,15 @@ The [Core Framework Marketplace](https://coreframework.com/marketplace) sells op
 
 = External services =
 
-Core Framework works without a Core Framework account or hosted Core Framework backend. It makes an external request only when an administrator selects, previews, or imports a Google-hosted font:
+Core Framework works without a Core Framework account or hosted Core Framework backend. It makes an external request only when an administrator explicitly asks for one:
 
 * The bundled font catalog is local. Selecting or previewing a Google Font requests CSS from https://fonts.googleapis.com. Importing it also downloads font files from https://fonts.gstatic.com, after which WordPress serves the saved font files locally. Requests identify the selected font family and variants; as with any web request, Google receives connection information such as the site's IP address and user agent. No Google API key or Google account is required.
 * Google Terms of Service: https://policies.google.com/terms
 * Google Privacy Policy: https://policies.google.com/privacy
 * Direct Figma-to-WordPress synchronization connects the Figma plugin directly to the user's own WordPress site using a connection key created by a site administrator. Project data is not routed through Core Framework servers.
+* Remote project import is optional and runs only when an administrator pastes a shareable project link or project ID and submits it. WordPress then requests that project from https://us-central1-core-framework-6bdc9.cloudfunctions.net/getPreset. The request is made by the server rather than the browser, sends no credentials, and the endpoint is read-only: it returns a project only when its owner has marked it as public. Nothing is sent unless an administrator submits a link, and no account is required to import one.
 
-The plugin's administration interface, image previews, project storage, CSS generation, and included integrations do not load assets from Core Framework servers. Core Framework does not contact a licensing server and does not require account activation.
+Apart from the requests listed above, the plugin's administration interface, image previews, project storage, CSS generation, and included integrations do not load assets from Core Framework servers. Core Framework does not contact a licensing server and does not require account activation.
 
 = Licensing =
 

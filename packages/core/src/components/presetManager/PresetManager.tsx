@@ -14,6 +14,7 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { clsx } from "clsx";
+import { fetchRemotePresetJson, parseRemotePresetId } from "functions/fetchRemotePreset";
 import { preparePresetToLoad } from "functions/preparePresetToLoad";
 import { sanitizePreset } from "functions/sanitizePreset";
 import { validatePreset } from "functions/validatePreset";
@@ -63,6 +64,8 @@ export const PresetManger = memo(() => {
 	}>({
 		color: null,
 	});
+
+	const [isExternalPresetLoading, setIsExternalPresetLoading] = useState(false);
 
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -335,6 +338,53 @@ export const PresetManger = memo(() => {
 				},
 			};
 		});
+	}
+
+	async function onExternalImportSubmit(e: React.FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+
+		const value = String(new FormData(e.currentTarget).get("url") ?? "");
+		const id = parseRemotePresetId(value);
+
+		if (!id) {
+			toast.error("Paste a shareable project link or a project ID");
+			return;
+		}
+
+		setIsExternalPresetLoading(true);
+
+		try {
+			const result = await fetchRemotePresetJson(id);
+
+			if (!result.success) {
+				toast.error(
+					result.reason === "not-found"
+						? "Project not found — make sure it is shared publicly"
+						: "Could not reach the project, please try again",
+				);
+				return;
+			}
+
+			const preset = JSON.parse(result.json) as Preset;
+			const parseReturn = validatePreset(preset);
+
+			if (!parseReturn.success) {
+				toast.error("Project is not valid");
+				return;
+			}
+
+			setExternalPreset(
+				preparePresetToLoad({
+					preset,
+					oldPreferences: await getPreferences(),
+				}),
+			);
+		} catch (error) {
+			toast.error("Something went wrong");
+			console.warn(error);
+		} finally {
+			setIsExternalPresetLoading(false);
+		}
 	}
 
 	const onProjectExport = useCallback(async () => {
@@ -931,6 +981,49 @@ export const PresetManger = memo(() => {
 				/>
 
 				<Dropzone onDrop={onExternalPresetDrop} accept={`.json,.${CORE_FILE_FORMAT}`} multiple={false} />
+
+				<div className="grid padding-l radius align-center gap-m bg-overlay-1">
+					<div className="grid gap-xs">
+						<h4>Remote import from the link</h4>
+						<p className="text-s">
+							<span className="opacity-50">
+								You can import a project remotely by pasting a shareable link or a project ID from the web
+								app.
+							</span>
+						</p>
+						<a
+							style={{
+								fontWeight: "600",
+								fontSize: "var(--text-s)",
+								color: "var(--color-main)",
+							}}
+							target="_blank"
+							href="https://docs.coreframework.com/remote-import"
+						>
+							How it works?
+						</a>
+					</div>
+
+					<form onSubmit={onExternalImportSubmit} className="row align-center gap-s full-width">
+						<input
+							type="text"
+							name="url"
+							placeholder="https://coreframework.com/app/..."
+							className="full-width"
+							style={{
+								flex: 1,
+							}}
+						/>
+
+						{isExternalPresetLoading ? (
+							<Loader />
+						) : (
+							<button type="submit" className="btn-tertiary btn-l">
+								Confirm
+							</button>
+						)}
+					</form>
+				</div>
 			</div>
 		</div>
 	);

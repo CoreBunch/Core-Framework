@@ -13,8 +13,11 @@ if (!["all", "figma", "source", "wp"].includes(surface)) {
 
 const forbidden = [
 	{
-		label: "retired hosted preset importer",
-		pattern: "us-central1-core-framework-6bdc9.cloudfunctions.net/getPreset",
+		// The public preset endpoint itself is allowed: it is read-only, serves
+		// only projects their owner shared publicly, and is reached solely when a
+		// user pastes a link. What must never ship is a credential for it.
+		label: "client-side credential for the public preset importer",
+		pattern: "x-api-key",
 	},
 	{ label: "remote placeholder images", pattern: "picsum.photos" },
 	{
