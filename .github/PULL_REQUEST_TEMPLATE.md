@@ -1,19 +1,23 @@
-## Summary
+## What
 
-Describe the change and why it is needed.
+<!-- The change in one or two sentences. For a bug fix, lead with the symptom. -->
+
+## Why
+
+<!-- The problem this solves, and what people did instead before it. Delete for an obvious chore. -->
 
 ## Verification
 
-- [ ] `bun run test:www`
-- [ ] Relevant web, WordPress, Figma, or integration builds
-- [ ] `bun run php-test:wp`, if PHP changed
-- [ ] Manual builder/editor verification, if relevant
+<!-- Real commands and their real output. Say if something fails and whether it also fails on main. -->
 
-## Checklist
+```
+bun run test:www
+bun run lint
+```
 
-- [ ] Tests cover behavior changes.
-- [ ] Documentation was updated when behavior, configuration, or public surfaces changed.
-- [ ] Shared behavior lives in `packages/core` where appropriate.
-- [ ] Project-schema or generated-CSS compatibility was considered.
-- [ ] No credentials, private URLs, local environment files, or unintended generated artifacts are included.
-- [ ] Third-party copyright and license notices are preserved.
+<!--
+UI change? Attach a screenshot (before and after if it replaces something).
+Performance change? Paste measured before/after numbers and the command that produced them.
+Touched packages/core? Verify against both the web and WordPress builds.
+Changed PHP? Run bun run php-test:wp.
+-->
