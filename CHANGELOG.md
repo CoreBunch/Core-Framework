@@ -6,13 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-08-18
+
 ### Fixed
 
-- Restored remote project import from a shareable link or a project ID. Preparing 2.0.0 for open source removed the importer's client-side credential, which left the request failing, and the unusable input was then deleted — taking a working feature and every shared link with it.
+- Restored the Auto BEM class generator in the Bricks structure panel. 2.0.0 moved the builder connector into the page footer while the generator still loaded in the head, so the generator read an undefined connector, failed its own feature check, and never started.
+- Restored remote project import from a shareable link or a project ID. Preparing 2.0.0 for open source removed the importer's client-side credential, which left every request failing, and the input that no longer worked was then deleted, taking the feature and every shared link with it.
+- Fixed Bricks synchronization for empty class sets.
+- Batched the Bricks reference sweep and reported pushes that fail instead of passing silently.
+- Fixed Figma plugin host message handling.
+- Fixed the WordPress URLs used inside the Figma sandbox.
+- Allowed the Figma connection key header through the REST CORS preflight, so Figma synchronization reaches the site.
 
 ### Changed
 
-- WordPress now retrieves a shared project through the plugin's own REST route rather than from the administrator's browser, so the request leaves the server and no third-party host is contacted by the admin screen.
+- WordPress now retrieves a shared project through the plugin's own REST route rather than from the administrator's browser, so the request leaves the server and the admin screen contacts no third-party host.
 
 ## [2.0.0] - 2026-08-12
 

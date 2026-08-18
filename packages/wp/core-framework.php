@@ -10,7 +10,7 @@
  * Plugin Name:     Core Framework
  * Plugin URI:      https://coreframework.com
  * Description:     The CORE of your website
- * Version:         2.0.0
+ * Version:         2.0.1
  * Author:          Core Framework
  * Author URI:      https://coreframework.com
  * Text Domain:     core-framework
@@ -40,7 +40,7 @@ define( 'CORE_FRAMEWORK_DIR_URL', plugin_dir_url( __FILE__ ) );
 define( 'CORE_FRAMEWORK_NAME', dirname( CORE_FRAMEWORK_MAIN_FILE ) );
 
 define( 'CORE_FRAMEWORK_DB_VER', '1.3' );
-define( 'CORE_FRAMEWORK_VERSION', '2.0.0' );
+define( 'CORE_FRAMEWORK_VERSION', '2.0.1' );
 
 define( 'CORE_FRAMEWORK_ASSETS_PREFIX', 'core-framework/core-framework/' );
 

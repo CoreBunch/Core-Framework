@@ -2,7 +2,7 @@
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
   "name": "core-framework/theme-toggle",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "title": "Theme Toggle",
   "category": "core-framework",
   "description": "Easily add toggle between dark and light mode. This feature requires use of the Core Framework classes and variables.",
