@@ -150,12 +150,16 @@ class Bricks extends Base {
 		);
 		\wp_enqueue_script( $name );
 
+		// Depends on the connector: the generator reads
+		// window.core_framework_connector once, at execution, and never retries.
+		// The connector moved to the footer in 2.0.0, so a head-loaded generator
+		// read an undefined object and silently never initialised.
 		\wp_register_script(
 			'bricks_bem_generator',
 			\plugins_url( '/assets/public/js/bricks_bem_generator.js', CORE_FRAMEWORK_ABSOLUTE ),
-			array(),
+			array( 'core-framework-builders-connector' ),
 			filemtime( CORE_FRAMEWORK_DIR_ROOT . '/assets/public/js/bricks_bem_generator.js' ),
-			false
+			true
 		);
 		\wp_enqueue_script( 'bricks_bem_generator' );
 
