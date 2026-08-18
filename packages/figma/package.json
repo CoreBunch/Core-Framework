@@ -1,6 +1,6 @@
 {
 	"name": "core-framework-figma",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"private": true,
 	"description": "Figma integration for Core Framework",
 	"author": "David Babinec",

@@ -4,7 +4,7 @@ Tags: css, framework, stylesheet, bricks, oxygen
 Requires at least: 6.0
 Requires PHP: 8.0
 Tested up to: 7.0
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: MIT
 License URI: https://opensource.org/license/mit
 
@@ -74,6 +74,14 @@ No. Marketplace design kits and packs are optional content products and are not 
 No. The font browser uses Google's public, keyless font endpoints.
 
 == Changelog ==
+
+= 2.0.1 =
+
+* Fixed the Auto BEM class generator not appearing in the Bricks structure panel after updating to 2.0.0.
+* Restored remote project import from a shareable project link or project ID.
+* Fixed Bricks synchronization for empty class sets, and reported pushes that fail rather than passing silently.
+* Fixed Figma plugin host message handling and the WordPress URLs used inside the Figma sandbox.
+* Allowed the Figma connection key header through the REST CORS preflight so Figma synchronization reaches the site.
 
 = 2.0.0 =
 

@@ -5,7 +5,7 @@
  * Description: Core Framework Gutenberg Integration
  * Author: Core Framework & Sebastian Piskaty
  * Author URI: https://coreframework.com & https://secumbu.at
- * Version:         2.0.0
+ * Version:         2.0.1
  * License: MIT
  * License URI: https://opensource.org/license/mit
  * Text Domain: coreframework
