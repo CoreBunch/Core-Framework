@@ -196,7 +196,8 @@ class Functions extends Base {
 		if ( $output === false ) {
 			$output = '[]';
 		}
-		// The value is JSON-encoded specifically for this Oxygen JavaScript hook.
+		$output = \htmlspecialchars( $output, \ENT_QUOTES );
+		// The JSON is HTML-escaped for Oxygen's double-quoted ng-init attribute.
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo \sprintf( 'elegantCustomFonts=%s;', $output );
 	}
