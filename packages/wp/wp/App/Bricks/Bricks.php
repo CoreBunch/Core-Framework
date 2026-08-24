@@ -94,10 +94,7 @@ class Bricks extends Base {
 			return;
 		}
 
-		$preset = $helper->loadPreset();
-		$preset_fonts = isset( $preset['modulesData'] ) && isset( $preset['modulesData']['FONTS'] )
-			? $preset['modulesData']['FONTS']['fonts']
-			: array();
+		$preset_fonts = $helper->getEnabledFonts();
 		$css = '';
 
 		foreach ( $preset_fonts as $font ) {
