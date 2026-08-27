@@ -14,7 +14,7 @@ import {
 import { FontNotFound } from "@core-framework/core/components/modules/fonts/components/FontNotFound";
 import { FontsList } from "./components/FontsList";
 import { FontData, FontVariantData } from "@core-framework/core/components/modules/fonts/types";
-import { blobToBase64, generateFontFaceCSS } from "./utils/utils";
+import { blobToBase64, generateFontFaceCSS, localFontFileName } from "./utils/utils";
 
 enum Tabs {
 	USER_FONTS = "user_fonts",
@@ -67,7 +67,7 @@ export function FontsTab() {
 
 				return {
 					font_base64: fontBase64.split(",")[1],
-					filename: `${font.family}-${variant}.woff2`,
+					filename: localFontFileName(font.family, variant),
 				};
 			}),
 		);
