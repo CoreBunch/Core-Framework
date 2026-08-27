@@ -45,6 +45,29 @@ class Helper {
 		return isset( $option['disable_fonts'] ) && $option['disable_fonts'];
 	}
 
+	/**
+	 * Get fonts that are enabled in the selected preset.
+	 *
+	 * @return array
+	 */
+	public function getEnabledFonts(): array {
+		$preset = $this->loadPreset();
+		$fonts  = isset( $preset['modulesData']['FONTS']['fonts'] )
+			? $preset['modulesData']['FONTS']['fonts']
+			: array();
+
+		if ( ! is_array( $fonts ) ) {
+			return array();
+		}
+
+		return array_values(
+			array_filter(
+				$fonts,
+				static fn( $font ): bool => is_array( $font ) && true === ( $font['enable'] ?? false )
+			)
+		);
+	}
+
 	public function setPresetId( string $preset_id ): void {
 		$options                = get_option( 'core_framework_main', array() );
 		$options['selected_id'] = $preset_id;

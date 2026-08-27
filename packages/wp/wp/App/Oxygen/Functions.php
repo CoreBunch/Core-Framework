@@ -186,10 +186,7 @@ class Functions extends Base {
 			return;
 		}
 
-		$preset = $helper->loadPreset();
-		$preset_fonts = isset( $preset['modulesData'] ) && isset( $preset['modulesData']['FONTS'] )
-			? $preset['modulesData']['FONTS']['fonts']
-			: array();
+		$preset_fonts = $helper->getEnabledFonts();
 		$customCoreFontFamilies = array_column($preset_fonts, 'family');
 
 		$output = \wp_json_encode($customCoreFontFamilies);
@@ -460,10 +457,7 @@ class Functions extends Base {
 			return;
 		}
 
-		$preset       = $helper->loadPreset();
-		$preset_fonts = isset( $preset['modulesData'] ) && isset( $preset['modulesData']['FONTS'] )
-			? $preset['modulesData']['FONTS']['fonts']
-			: array();
+		$preset_fonts = $helper->getEnabledFonts();
 		$css          = '';
 
 		foreach ( $preset_fonts as $font ) {
