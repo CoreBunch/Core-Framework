@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 
 - Fixed saving from the Figma plugin, which did nothing and logged `SecurityError: Failed to read the 'localStorage' property from 'Window'`. The editor runs inside Figma's sandboxed `about:srcdoc` frame, where reading `localStorage` is denied, and the save's rate limiter read it on every push and threw before the save could run. Storage access now falls back to an in-memory store when the browser blocks it, so saving from the Figma Desktop app works again.
+- Fixed the Oxygen Classic builder hanging on its loading screen when the active preset contained custom fonts. The font list was written into Oxygen's `ng-init` attribute without HTML-escaping, so the first quote closed the attribute and left AngularJS with a truncated expression that never finished loading the builder. The value is now escaped as Oxygen's own core does.
+- Stopped disabled fonts from reaching the Oxygen and Bricks builders. The Oxygen font dropdown and the styles injected into both builders now cover only the fonts you have enabled, matching what the editor previews.
 
 ## [2.0.1] - 2026-08-18
 
