@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed saving from the Figma plugin, which did nothing and logged `SecurityError: Failed to read the 'localStorage' property from 'Window'`. The editor runs inside Figma's sandboxed `about:srcdoc` frame, where reading `localStorage` is denied, and the save's rate limiter read it on every push and threw before the save could run. Storage access now falls back to an in-memory store when the browser blocks it, so saving from the Figma Desktop app works again.
+
 ## [2.0.1] - 2026-08-18
 
 ### Fixed
