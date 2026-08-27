@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { devLog } from "functions/devLog";
 import { isEmbed } from "functions/isEmbed";
 import { preparePresetToLoad } from "functions/preparePresetToLoad";
+import { safeLocalStorage } from "functions/safeLocalStorage";
 import { sanitizePreset } from "functions/sanitizePreset";
 import { validatePreset } from "functions/validatePreset";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -262,7 +263,7 @@ export function App() {
 	}
 
 	function handleLocal() {
-		const current_framework = localStorage.getItem("current_framework");
+		const current_framework = safeLocalStorage.getItem("current_framework");
 
 		if (current_framework) {
 			const parsed = JSON.parse(current_framework);

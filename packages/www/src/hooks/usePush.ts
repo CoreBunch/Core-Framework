@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import { isEmbed } from "functions/isEmbed";
 import { isFigma } from "functions/isFigma";
 import { minifyCss } from "functions/minifyCss";
+import { safeLocalStorage } from "functions/safeLocalStorage";
 import { sanitizePreset } from "functions/sanitizePreset";
 import { useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
@@ -25,11 +26,11 @@ import { usePushFigma } from "./usePushFigma";
 const LIMITER_LOCAL_STORAGE_KEY = "cf-limiter";
 const LIMITER_TIMEOUT = 2000;
 
-const rateLimiter =
+export const rateLimiter =
 	<T extends (...args: any[]) => Promise<any>>(fn: T) =>
 	async (...args: Parameters<T>) => {
 		const now = Date.now();
-		const lastCall = localStorage.getItem(LIMITER_LOCAL_STORAGE_KEY);
+		const lastCall = safeLocalStorage.getItem(LIMITER_LOCAL_STORAGE_KEY);
 
 		if (lastCall) {
 			const diff = now - Number(lastCall);
@@ -40,7 +41,7 @@ const rateLimiter =
 			}
 		}
 
-		localStorage.setItem(LIMITER_LOCAL_STORAGE_KEY, String(now));
+		safeLocalStorage.setItem(LIMITER_LOCAL_STORAGE_KEY, String(now));
 
 		// Add small delay to ensure all state updates are flushed
 		await new Promise((resolve) => setTimeout(resolve, 150));
@@ -243,7 +244,7 @@ export function usePush() {
 				"*",
 			);
 		} else {
-			localStorage.setItem("current_framework", JSON.stringify(sanitizePreset(newPresetData)));
+			safeLocalStorage.setItem("current_framework", JSON.stringify(sanitizePreset(newPresetData)));
 		}
 
 		// Store the current state as the last saved state with sorted keys for consistent comparison
