@@ -64,7 +64,7 @@ final class OxygenCustomFontsTest extends TestCase {
 			'modulesData' => array(
 				'FONTS' => array(
 					'fonts' => array_map(
-						fn( string $family ): array => array( 'family' => $family ),
+						fn( string $family ): array => array( 'family' => $family, 'enable' => true ),
 						$families
 					),
 				),
