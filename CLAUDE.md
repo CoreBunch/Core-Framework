@@ -75,8 +75,8 @@ bun run build:figma
 # Export WordPress plugin for distribution
 bun run export:wp
 
-# Version bumping (run before releases)
-bun run bump <current-version> <new-version>
+# Version bumping (interactive semver picker; run before releases)
+bun run bump
 ```
 
 ## Architecture
