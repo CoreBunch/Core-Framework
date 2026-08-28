@@ -1,38 +1,48 @@
 import { SimpleVariable } from "../src/types";
-import { parseHttpUrl, parseWordPressConnectionKey } from "./wordpressConnection";
+import {
+	ALLOWED_REST_ROUTES,
+	PRESET_REST_ROUTE,
+	extractRestRoute,
+	fetchWordPressRest,
+	parseHttpUrl,
+	parseWordPressConnectionKey,
+} from "./wordpressConnection";
 
 const PRESET_API_KEY_STORAGE_KEY = "cf_plugin_project_api_key";
 const PRESET_LOCAL_STORAGE_KEY = "cf_plugin_project_local";
 
-async function fetchPreset(connectionKey: string) {
+interface PresetResponse {
+	success?: boolean;
+	data?: unknown;
+}
+
+async function fetchPreset(connectionKey: string): Promise<PresetResponse> {
 	const connection = parseWordPressConnectionKey(connectionKey);
 	if (!connection) throw new Error("Invalid WordPress connection key");
 
-	const endpoint = `${connection.siteUrl}/wp-json/core-framework/v2/preset`;
-	const response = await fetch(endpoint, {
+	const result = await fetchWordPressRest(connection.siteUrl, PRESET_REST_ROUTE, {
 		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
-			"X-Core-Framework-Key": connectionKey,
-		},
+		connectionKey,
 	});
 
-	if (response?.status !== 200) {
-		throw new Error("Failed to fetch preset");
+	if (!result.reachable) {
+		throw new Error(
+			`Could not reach ${connection.siteUrl}. Check the site is online and the Core Framework plugin is active.`,
+		);
 	}
 
-	return await response.json();
-}
+	if (result.status === 401 || result.status === 403) {
+		throw new Error(
+			"WordPress rejected the connection key. Open the Core Framework plugin on your site, generate a new key, and paste it again.",
+		);
+	}
 
-const ALLOWED_WORDPRESS_PATHS = new Set([
-	"/wp-json/core-framework/v2/preset",
-	"/wp-json/core-framework/v2/preset-css",
-	"/wp-json/core-framework/v2/figma/update-colors",
-	"/wp-json/core-framework/v2/figma/update-classes",
-	"/wp-json/core-framework/v2/figma/update-grouped-classes",
-	"/wp-json/core-framework/v2/figma/update-prefixed-css-file",
-	"/wp-json/core-framework/v2/figma/save-oxygen-css-helper",
-]);
+	if (!result.ok) {
+		throw new Error(`WordPress returned ${result.status} for the preset request.`);
+	}
+
+	return (result.data ?? {}) as PresetResponse;
+}
 
 async function getStoredConnectionKey() {
 	const storedKey = await figma.clientStorage.getAsync(PRESET_API_KEY_STORAGE_KEY);
@@ -65,33 +75,31 @@ async function handleWordPressRequest(msg: {
 	try {
 		const connection = await getWordPressConnection();
 		const target = parseHttpUrl(msg.url);
+		const route = extractRestRoute(msg.url);
 
 		if (
 			!connection ||
 			!target ||
 			target.origin !== connection.siteUrl ||
-			!ALLOWED_WORDPRESS_PATHS.has(target.pathname) ||
+			!route ||
+			!ALLOWED_REST_ROUTES.has(route) ||
 			!["GET", "POST", "PUT"].includes(msg.method)
 		) {
 			throw new Error("Blocked WordPress request");
 		}
 
-		const response = await fetch(target.href, {
+		const result = await fetchWordPressRest(connection.siteUrl, route, {
 			method: msg.method,
-			headers: {
-				"Content-Type": "application/json",
-				"X-Core-Framework-Key": connection.connectionKey,
-			},
+			connectionKey: connection.connectionKey,
 			body: msg.body,
 		});
-		const data = await response.json();
 
 		figma.ui.postMessage({
 			type: "wordpress-response",
 			requestId: msg.requestId,
-			ok: response.ok,
-			status: response.status,
-			data,
+			ok: result.ok,
+			status: result.status,
+			data: result.data,
 		});
 	} catch (error) {
 		figma.ui.postMessage({
