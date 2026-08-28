@@ -1,4 +1,5 @@
-export { getFontProps, mergeRootSelectors, applyFontToStylesheet } from '@core-framework/core/components/modules/fonts/utils/utils';
+export { getFontProps, mergeRootSelectors, applyFontToStylesheet, sanitizeFontFileName, localFontFileName } from '@core-framework/core/components/modules/fonts/utils/utils';
+import { localFontFileName } from '@core-framework/core/components/modules/fonts/utils/utils';
 import { FontData, FontVariantData } from '@core-framework/core/components/modules/fonts/types';
 import { Font } from "fontkit";
 import * as fontkit from "fontkit";
@@ -36,7 +37,7 @@ ${selectedFont.customSelectors} {
 				const weight = variant.id.match(/\d{3}/)?.[0] || "400";
 				const style = variant.id.includes("italic") ? "italic" : "normal";
 				const subPath = getCustomSubpath();
-				const fontURL = `${subPath}/wp-content/uploads/core-framework/fonts/${selectedFont.family}-${variant.id}.woff2`;
+				const fontURL = `${subPath}/wp-content/uploads/core-framework/fonts/${localFontFileName(selectedFont.family, variant.id)}`;
 				const comment = variant.comment ? `\n//${variant.comment}` : "";
 				const cssSelector = variant.cssSelector.length
 					? `

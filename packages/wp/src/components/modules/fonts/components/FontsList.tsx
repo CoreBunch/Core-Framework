@@ -4,7 +4,7 @@ import { GoogleFontLogo } from "../../../../assets/icons/GoogleFontLogo.icon";
 import { Remove } from "../../../../assets/icons/Remove.icon";
 import { ClassHeader } from "../../../ClassHeader";
 import { FontData, FontVariantData } from "@core-framework/core/components/modules/fonts/types";
-import { generateFontFaceCSS } from "../utils/utils";
+import { generateFontFaceCSS, localFontFileName } from "../utils/utils";
 import { Switch } from "@mantine/core";
 import clsx from "clsx";
 import { useAtom } from "jotai/index";
@@ -72,7 +72,7 @@ export function FontsList({ googleFonts }: { googleFonts: FontFace[] }) {
 						"X-WP-Nonce": window.wpApiSettings.nonce,
 					},
 					body: JSON.stringify({
-						fonts: selectedVariants.map((v: string) => ({ filename: `${font.family}-${v}.woff2` })),
+						fonts: selectedVariants.map((v: string) => ({ filename: localFontFileName(font.family, v) })),
 					}),
 				});
 				const result = await response.json();
