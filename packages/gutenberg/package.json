@@ -1,6 +1,6 @@
 {
 	"name": "coreframework-gutenberg-integration",
-	"version": "2.0.1",
+	"version": "2.0.2",
 	"description": "Gutenberg editor integration for Core Framework.",
 	"author": "David Babinec",
 	"main": "index.js",
