@@ -574,12 +574,14 @@ class Helper {
 						$main_name           = $color['name'];
 						$local_color_names[] = $main_name;
 
-						$shades = isset( $color['shades'] ) ? $color['shades'] : array();
+						$is_shades = isset( $color['isShades'] ) && $color['isShades'] === true;
+						$shades    = $is_shades && isset( $color['shades'] ) ? $color['shades'] : array();
 						foreach ( $shades as $shade ) {
 							$local_color_names[] = $shade['name'];
 						}
 
-						$tints = isset( $color['tints'] ) ? $color['tints'] : array();
+						$is_tints = isset( $color['isTints'] ) && $color['isTints'] === true;
+						$tints    = $is_tints && isset( $color['tints'] ) ? $color['tints'] : array();
 						foreach ( $tints as $tint ) {
 							$local_color_names[] = $tint['name'];
 						}
@@ -879,12 +881,14 @@ class Helper {
 						$main_name           = $color['name'];
 						$local_color_names[] = $main_name;
 
-						$shades = isset( $color['shades'] ) ? $color['shades'] : array();
+						$is_shades = isset( $color['isShades'] ) && $color['isShades'] === true;
+						$shades    = $is_shades && isset( $color['shades'] ) ? $color['shades'] : array();
 						foreach ( $shades as $shade ) {
 							$local_color_names[] = $shade['name'];
 						}
 
-						$tints = isset( $color['tints'] ) ? $color['tints'] : array();
+						$is_tints = isset( $color['isTints'] ) && $color['isTints'] === true;
+						$tints    = $is_tints && isset( $color['tints'] ) ? $color['tints'] : array();
 						foreach ( $tints as $tint ) {
 							$local_color_names[] = $tint['name'];
 						}
@@ -1167,12 +1171,14 @@ class Helper {
 						$name                               = $color['name'];
 						$grouped_variables['colorStyles'][] = $variable_prefix . $name;
 
-						$shades = isset( $color['shades'] ) ? $color['shades'] : array();
+						$is_shades = isset( $color['isShades'] ) && $color['isShades'] === true;
+						$shades    = $is_shades && isset( $color['shades'] ) ? $color['shades'] : array();
 						foreach ( $shades as $shade ) {
 							$grouped_variables['colorStyles'][] = $variable_prefix . $shade['name'];
 						}
 
-						$tints = isset( $color['tints'] ) ? $color['tints'] : array();
+						$is_tints = isset( $color['isTints'] ) && $color['isTints'] === true;
+						$tints    = $is_tints && isset( $color['tints'] ) ? $color['tints'] : array();
 						foreach ( $tints as $tint ) {
 							$grouped_variables['colorStyles'][] = $variable_prefix . $tint['name'];
 						}
@@ -1432,12 +1438,14 @@ class Helper {
 							$name = $color['name'];
 							$grouped_variables['colorStyles'][ $group_name ][] = $variable_prefix . $name;
 
-							$shades = isset( $color['shades'] ) ? $color['shades'] : array();
+							$is_shades = isset( $color['isShades'] ) && $color['isShades'] === true;
+							$shades    = $is_shades && isset( $color['shades'] ) ? $color['shades'] : array();
 							foreach ( $shades as $shade ) {
 								$grouped_variables['colorStyles'][ $group_name ][] = $variable_prefix . $shade['name'];
 							}
 
-							$tints = isset( $color['tints'] ) ? $color['tints'] : array();
+							$is_tints = isset( $color['isTints'] ) && $color['isTints'] === true;
+							$tints    = $is_tints && isset( $color['tints'] ) ? $color['tints'] : array();
 							foreach ( $tints as $tint ) {
 								$grouped_variables['colorStyles'][ $group_name ][] = $variable_prefix . $tint['name'];
 							}
