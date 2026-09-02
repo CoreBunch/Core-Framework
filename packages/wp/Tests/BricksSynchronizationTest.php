@@ -22,6 +22,20 @@ if ( ! class_exists( 'WP_REST_Response' ) ) {
 	}
 }
 
+if ( ! class_exists( 'WP_REST_Request' ) ) {
+	class WP_REST_Request {
+		private $body;
+
+		public function __construct( $body = '' ) {
+			$this->body = $body;
+		}
+
+		public function get_body() {
+			return $this->body;
+		}
+	}
+}
+
 if ( ! function_exists( 'get_option' ) ) {
 	function get_option( $option, $default = false ) {
 		return array_key_exists( $option, $GLOBALS['cf_test_options'] )
@@ -219,6 +233,10 @@ final class BricksSynchronizationTest extends TestCase {
 		};
 	}
 
+	private function createFigmaRequest( array $body ): WP_REST_Request {
+		return new WP_REST_Request( json_encode( $body ) );
+	}
+
 	public function testEmptySelectorPayloadStillRefreshesBricksVariables(): void {
 		$request = $this->createRequest(
 			array(
@@ -261,6 +279,44 @@ final class BricksSynchronizationTest extends TestCase {
 		$this->createRestController()->update_classes( $request );
 
 		$this->assertSame( array( array( 'padding', 'margin' ) ), $GLOBALS['cf_test_bricks_builder']->selectors );
+	}
+
+	public function testFigmaEmptySelectorPayloadDoesNotCreateBlankOxygenSelector(): void {
+		$GLOBALS['cf_test_options']['core_framework_main'] = array(
+			'bricks' => false,
+			'oxygen' => true,
+		);
+		$GLOBALS['cf_test_bricks_builder'] = new CoreFrameworkTestBuilder( false );
+		$GLOBALS['cf_test_oxygen_builder'] = new CoreFrameworkTestBuilder( true );
+
+		$response = $this->createRestController()->figma_update_classes(
+			$this->createFigmaRequest( array( 'classes' => '' ) )
+		);
+
+		$this->assertSame( array( array() ), $GLOBALS['cf_test_oxygen_builder']->selectors );
+		$this->assertSame(
+			array(
+				'success'         => true,
+				'active_builders' => array( 'oxygen' ),
+			),
+			$response->get_data()
+		);
+	}
+
+	public function testFigmaEmptySelectorPayloadStillRefreshesBricksVariables(): void {
+		$response = $this->createRestController()->figma_update_classes(
+			$this->createFigmaRequest( array( 'classes' => '' ) )
+		);
+
+		$this->assertSame( array( array() ), $GLOBALS['cf_test_bricks_builder']->selectors );
+		$this->assertSame( 1, $GLOBALS['cf_test_bricks_builder']->variable_refreshes );
+		$this->assertSame(
+			array(
+				'success'         => true,
+				'active_builders' => array( 'bricks' ),
+			),
+			$response->get_data()
+		);
 	}
 
 	public function testClassSynchronizationRemovesFinalCoreClassAndOnlyItsReferences(): void {
