@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { InspectorControls } from "@wordpress/block-editor";
 import { PanelBody, PanelRow, SearchControl, Spinner, TabPanel } from "@wordpress/components";
 import { createHigherOrderComponent } from "@wordpress/compose";
@@ -210,6 +210,8 @@ const withInspectorControls = createHigherOrderComponent((BlockEdit: React.Compo
 
 		const [selectedSearchResult, setSelectedSearchResult] = useState(-1);
 
+		const isInitialMount = useRef(true);
+
 		useEffect(() => {
 			if (!props.attributes.className) {
 				return;
@@ -224,14 +226,16 @@ const withInspectorControls = createHigherOrderComponent((BlockEdit: React.Compo
 			}));
 		}, []);
 
-		useEffect(
-			() => {
-				props.setAttributes({
-					className: [...classNames.active, ...classNames.dynamic].join(" "),
-				});
-			},
-			[classNames],
-		);
+		useEffect(() => {
+			if (isInitialMount.current) {
+				isInitialMount.current = false;
+				return;
+			}
+
+			props.setAttributes({
+				className: [...classNames.active, ...classNames.dynamic].join(" "),
+			});
+		}, [classNames]);
 
 		useEffect(() => {
 			setSearchValue("");
