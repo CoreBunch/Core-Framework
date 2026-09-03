@@ -219,7 +219,7 @@ Then publish `packages/www/dist` at the matching path, such as `https://example.
 
 ## WordPress development
 
-Requirements: WordPress 6.0 or newer, PHP 8.0 or newer, Composer, Bun 1.3.x, and a local HTTPS certificate.
+Requirements: WordPress 6.6 or newer, PHP 8.0 or newer, Composer, Bun 1.3.x, and a local HTTPS certificate.
 
 1. Link the plugin package into your WordPress installation:
 

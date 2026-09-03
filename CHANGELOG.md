@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Changed
+
+- Core Framework 2.x now requires WordPress 6.6 or newer.
+
+### Fixed
+
+- Fixed the Gutenberg editor failing with an undefined `ReactJSXRuntime` by loading the generated script dependency manifest, including the `react-jsx-runtime` dependency introduced in WordPress 6.6.
+
 ## [2.0.2] - 2026-08-28
 
 ### Fixed

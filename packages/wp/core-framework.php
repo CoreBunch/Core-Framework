@@ -18,7 +18,7 @@
  * License:         MIT
  * License URI:     https://opensource.org/license/mit
  * Requires PHP:    8.0
- * Requires at least: 6.0
+ * Requires at least: 6.6
  * Namespace:       CoreFramework
  */
 
