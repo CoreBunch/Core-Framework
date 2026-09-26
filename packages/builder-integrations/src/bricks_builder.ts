@@ -185,16 +185,17 @@ type Styles = Record<string, Record<string, string[]>>;
 		return children.find((child) => child.textContent?.trim().includes(data.family));
 	};
 
+	let themeToggleInitialized = false;
 	const addThemeToggleButton = () => {
-		if (!assertOption("bricks_enable_dark_mode_preview")) {
+		if (themeToggleInitialized || !assertOption("bricks_enable_dark_mode_preview")) {
 			return;
 		}
+		themeToggleInitialized = true;
 
 		const themeMode = window?.core_framework_connector?.theme_mode ?? "light";
-		const leftPanel =
-			document.querySelector("#bricks-toolbar .group-wrapper.left") ||
-			document.querySelector("#bricks-toolbar .group-wrapper.start");
 		const THEME_TOGGLE_BUTTON_CLASS = "cf-theme-toggle-button";
+		const toolbarSelector = "#bricks-toolbar, .bricks-toolbar";
+		const groupSelector = ":is(#bricks-toolbar, .bricks-toolbar) .group-wrapper";
 
 		// Sun icon (shown in light mode — click to switch to dark)
 		const sunIcon = `<svg class="cf-theme-icon cf-theme-icon--sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg>`;
@@ -205,45 +206,18 @@ type Styles = Record<string, Record<string, string[]>>;
 		// Small CF badge
 		const cfBadge = `<span class="cf-theme-badge">${coreIconSvg}</span>`;
 
-		if (!leftPanel) {
-			log("Left panel not found");
-			return;
-		}
-
-		const liButton =
-			leftPanel.querySelector("li.settings") ||
-			leftPanel.querySelector("li.pages") ||
-			leftPanel.querySelector("li:not(.logo)");
-		const toggleButton = liButton?.cloneNode(true) as HTMLLIElement;
-
-		if (!toggleButton) {
-			log("Button not found");
-			return;
-		}
-
-		toggleButton.classList.remove("settings");
-		toggleButton.classList.remove("pages");
+		// Own the markup so Bricks' active state, IDs and inline order aren't cloned.
+		const toggleButton = document.createElement("li");
 		toggleButton.classList.add("theme-toggle", "cf-theme-toggle");
 		toggleButton.setAttribute("data-balloon", "Toggle Core Framework theme");
-
-		const svg = toggleButton.querySelector("svg");
-		svg?.remove();
-
-		const span = toggleButton.querySelector("span");
-
-		leftPanel.appendChild(toggleButton);
-
-		// Set initial icon content (sun/moon + CF badge)
-		const savedTheme = window?.localStorage?.getItem("cf-theme") as "dark" | "light" | "auto" | null;
-		const isDarkInitial = savedTheme === "dark";
-
-		if (span) {
-			span.innerHTML = sunIcon + moonIcon + cfBadge;
-			const sunEl = span.querySelector(".cf-theme-icon--sun") as HTMLElement;
-			const moonEl = span.querySelector(".cf-theme-icon--moon") as HTMLElement;
-			if (sunEl) sunEl.style.display = isDarkInitial ? "none" : "block";
-			if (moonEl) moonEl.style.display = isDarkInitial ? "block" : "none";
-		}
+		toggleButton.setAttribute("aria-label", "Toggle Core Framework theme");
+		toggleButton.setAttribute("role", "button");
+		toggleButton.tabIndex = 0;
+		const span = document.createElement("span");
+		span.className = "bricks-svg-wrapper";
+		span.setAttribute("aria-hidden", "true");
+		span.innerHTML = sunIcon + moonIcon + cfBadge;
+		toggleButton.appendChild(span);
 
 		// Inject CF theme toggle styles
 		const cfToggleStyle = document.createElement("style");
@@ -252,7 +226,7 @@ type Styles = Record<string, Record<string, string[]>>;
 			.cf-theme-toggle {
 				position: relative;
 			}
-			.cf-theme-toggle span {
+			.cf-theme-toggle > .bricks-svg-wrapper {
 				position: relative;
 				display: flex;
 				align-items: center;
@@ -292,38 +266,50 @@ type Styles = Record<string, Record<string, string[]>>;
 			const moonEl = toggleButton.querySelector(".cf-theme-icon--moon") as HTMLElement;
 			if (sunEl) sunEl.style.display = isDark ? "none" : "block";
 			if (moonEl) moonEl.style.display = isDark ? "block" : "none";
+			toggleButton.setAttribute("aria-pressed", String(isDark));
 		};
 
-		(document.getElementById(IFRAME_ID) as HTMLIFrameElement)?.addEventListener("load", () =>
-			setTimeout(() => {
-				const iframeDocument = (document.getElementById(IFRAME_ID) as HTMLIFrameElement)?.contentDocument;
-				const iframeHtml = iframeDocument?.querySelector("html");
-				const html = document.querySelector("html") as HTMLHtmlElement;
+		const syncTheme = () => {
+			const iframeDocument = (document.getElementById(IFRAME_ID) as HTMLIFrameElement)?.contentDocument;
+			const iframeHtml = iframeDocument?.querySelector("html");
+			const html = document.querySelector("html") as HTMLHtmlElement;
 
-				if (iframeDocument && iframeHtml) {
-					iframeHtml.classList.remove(...[ThemeClasses.DARK, ThemeClasses.LIGHT]);
-					html?.classList?.remove(...[ThemeClasses.DARK, ThemeClasses.LIGHT]);
+			if (iframeDocument && iframeHtml) {
+				iframeHtml.classList.remove(...[ThemeClasses.DARK, ThemeClasses.LIGHT]);
+				html?.classList?.remove(...[ThemeClasses.DARK, ThemeClasses.LIGHT]);
 
-					const savedTheme = window?.localStorage?.getItem("cf-theme") as "dark" | "light" | "auto" | null;
-					const defaultTheme = String(themeMode === "auto" ? getSystemThemeClass() : `cf-theme-${themeMode}`);
+				const savedTheme = window?.localStorage?.getItem("cf-theme") as "dark" | "light" | "auto" | null;
+				const selectedTheme = savedTheme ?? themeMode;
+				const themeClass = selectedTheme === "auto" ? getSystemThemeClass() : `cf-theme-${selectedTheme}`;
 
-					iframeHtml.classList.add(savedTheme ? `cf-theme-${savedTheme}` : defaultTheme);
-					html?.classList?.add(savedTheme ? `cf-theme-${savedTheme}` : defaultTheme);
+				iframeHtml.classList.add(themeClass);
+				html?.classList?.add(themeClass);
+			}
+
+			updateToggleIcons(html?.classList?.contains(ThemeClasses.DARK) ?? false);
+
+			if (!iframeDocument) {
+				log("Iframe document not found");
+				return;
+			}
+
+			[...iframeDocument.getElementsByClassName(THEME_TOGGLE_BUTTON_CLASS)].forEach((button) => {
+				button.classList.remove(ThemeClasses.DARK, ThemeClasses.LIGHT);
+				button.classList.add(
+					html?.classList?.contains(ThemeClasses.DARK) ? ThemeClasses.LIGHT : ThemeClasses.DARK,
+				);
+			});
+		};
+
+		// Capture iframe loads even when Vue creates or replaces the iframe later.
+		document.addEventListener(
+			"load",
+			(event) => {
+				if (event.target instanceof HTMLIFrameElement && event.target.id === IFRAME_ID) {
+					setTimeout(syncTheme, 5);
 				}
-
-				updateToggleIcons(html?.classList?.contains(ThemeClasses.DARK) ?? false);
-
-				if (!iframeDocument) {
-					log("Iframe document not found");
-					return;
-				}
-
-				[...iframeDocument.getElementsByClassName(THEME_TOGGLE_BUTTON_CLASS)].forEach((button) => {
-					button.classList.add(
-						html?.classList?.contains(ThemeClasses.DARK) ? ThemeClasses.LIGHT : ThemeClasses.DARK,
-					);
-				});
-			}, 5),
+			},
+			true,
 		);
 
 		toggleButton.addEventListener("click", (e) => {
@@ -364,6 +350,60 @@ type Styles = Record<string, Record<string, string[]>>;
 				button.className = classes.join(" ");
 			});
 		});
+
+		toggleButton.addEventListener("keydown", (event) => {
+			if (event.key === "Enter" || event.key === " ") {
+				event.preventDefault();
+				event.stopPropagation();
+				toggleButton.click();
+			}
+		});
+
+		const mountToggle = () => {
+			const groups = [...document.querySelectorAll<HTMLElement>(groupSelector)].filter(
+				(group) => !group.matches(".is-hidden, .is-empty"),
+			);
+			// Bricks 2.4 can move/hide the start group or replace entire toolbars.
+			const group = groups.find((candidate) => candidate.matches(".left, .start")) ?? groups[0];
+			if (!group) return;
+
+			const siblings = [...group.children].filter((child) => child !== toggleButton);
+			// Bricks 2.4 uses CSS order, so appending alone doesn't place the toggle last.
+			const order = String(
+				Math.max(0, ...siblings.map((child) => Number(getComputedStyle(child).order) || 0)) + 1,
+			);
+			if (toggleButton.style.order !== order) toggleButton.style.order = order;
+			const tooltipPosition =
+				siblings.find((child) => child.hasAttribute("data-balloon-pos"))?.getAttribute("data-balloon-pos") ??
+				"bottom";
+			toggleButton.setAttribute("data-balloon-pos", tooltipPosition);
+			if (toggleButton.parentElement !== group) group.appendChild(toggleButton);
+		};
+
+		// Ignore editor/content mutations; only toolbar structure, visibility and order matter.
+		const toolbarObserver = new MutationObserver((mutations) => {
+			const toolbarChanged = mutations.some((mutation) => {
+				const target = mutation.target;
+				if (!(target instanceof Element) || target === toggleButton) return false;
+				if (target.matches(toolbarSelector) || target.matches(groupSelector)) return true;
+				if (mutation.type === "attributes") {
+					return mutation.attributeName === "style" && target.parentElement?.matches(groupSelector);
+				}
+				return [...mutation.addedNodes, ...mutation.removedNodes].some(
+					(node) =>
+						node instanceof Element && (node.matches(toolbarSelector) || node.querySelector(toolbarSelector)),
+				);
+			});
+			if (toolbarChanged) mountToggle();
+		});
+		toolbarObserver.observe(document.querySelector("#bricks-workspace") ?? document.body, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ["class", "style"],
+		});
+		mountToggle();
+		syncTheme();
 	};
 
 	const applyClassOnHover = () => {
