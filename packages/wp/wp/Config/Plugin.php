@@ -33,6 +33,25 @@ final class Plugin {
 	use Singleton;
 
 	/**
+	 * Root file headers read into the plugin data, keyed by data key
+	 *
+	 * @since 2.1.0
+	 */
+	public const HEADERS = array(
+		'name'         => 'Plugin Name',
+		'uri'          => 'Plugin URI',
+		'description'  => 'Description',
+		'version'      => 'Version',
+		'author'       => 'Author',
+		'author-uri'   => 'Author URI',
+		'text-domain'  => 'Text Domain',
+		'domain-path'  => 'Domain Path',
+		'required-php' => 'Requires PHP',
+		'required-wp'  => 'Requires at least',
+		'namespace'    => 'Namespace',
+	);
+
+	/**
 	 * Get the plugin meta data from the root file and include own data
 	 *
 	 * @since 0.0.0
@@ -47,23 +66,7 @@ final class Plugin {
 		return array_merge(
 			\apply_filters(
 				'core_framework_plugin_meta_data',
-				\get_file_data(
-					CORE_FRAMEWORK_ABSOLUTE,
-					array(
-						'name'         => 'Plugin Name',
-						'uri'          => 'Plugin URI',
-						'description'  => 'Description',
-						'version'      => 'Version',
-						'author'       => 'Author',
-						'author-uri'   => 'Author URI',
-						'text-domain'  => 'Text Domain',
-						'domain-path'  => 'Domain Path',
-						'required-php' => 'Requires PHP',
-						'required-wp'  => 'Requires WP',
-						'namespace'    => 'Namespace',
-					),
-					'plugin'
-				)
+				\get_file_data( CORE_FRAMEWORK_ABSOLUTE, self::HEADERS, 'plugin' )
 			),
 			$plugin_data
 		);
