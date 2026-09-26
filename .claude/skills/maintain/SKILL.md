@@ -109,6 +109,10 @@ packages/www/package.json
 
 The release builders **reject** a tag whose version does not match every one of these.
 
+### 1a. The Bun version is pinned in two places
+
+`packageManager` in the root `package.json` (`bun@1.3.11`, with `engines.bun`) and the `bunx bun@1.3.11` install and build commands in `packages/www/vercel.json`, which is what the hosted web app builds with. `bun run bump` touches neither. Change them together, or Vercel builds with a different Bun than CI.
+
 ### 2. The open-source boundary gate
 
 `bun run check:open-source` (`scripts/check-open-source-boundaries.ts`) is an **architecture test, not a lint**. It fails the build on forbidden strings in `packages/{core,figma,wp,www}/src`, `packages/wp/wp`, and — in CI — the built `packages/figma/dist` and `packages/wp/dist`:

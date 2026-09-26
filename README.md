@@ -217,6 +217,8 @@ bun run --filter './packages/www' build -- --base=/core-framework/
 
 Then publish `packages/www/dist` at the matching path, such as `https://example.com/core-framework/`.
 
+The hosted editor at [coreframework.com/app](https://coreframework.com/app) deploys from `main` of this repository on Vercel, using [`packages/www/vercel.json`](packages/www/vercel.json). See [RELEASING.md](RELEASING.md#web-app).
+
 ## WordPress development
 
 Requirements: WordPress 6.6 or newer, PHP 8.0 or newer, Composer, Bun 1.3.x, and a local HTTPS certificate.
