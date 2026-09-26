@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Stopped disabled shades and tints from appearing as variables in the Oxygen and Bricks builders. The generated CSS already left out a color's shades or tints once you switched them off, but the builder variable dropdowns and Oxygen Classic's Alt-click variable panel still listed them, so picking one pointed at a custom property that did not exist.
 - Fixed the block editor and Site Editor marking a clean post, template or template part as modified ("Review changes") as soon as it opened. The Core Framework class panel wrote an empty class name to every block before loading its saved classes, which counted as an edit. The panel now starts from the block's saved classes and only writes when a class actually changes.
 - Restored the Core Framework dark and light preview toggle in the Bricks 2.4 toolbar. Bricks 2.4 replaced its single toolbar with several position-specific ones, so the toggle never appeared. It now sits last in the toolbar, comes back when Bricks rebuilds its toolbars, works from the keyboard, and follows an "auto" theme preference.
+- Core Framework's own WordPress version check now runs. It read a plugin header the plugin never declared, so a site running Core Framework on a WordPress version older than it requires (for example after copying the plugin files in by hand, or downgrading WordPress) kept the plugin active. The plugin now deactivates itself on those sites and shows a notice naming the version it needs.
 
 ## [2.0.2] - 2026-08-28
 
