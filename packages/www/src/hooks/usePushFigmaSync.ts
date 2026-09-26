@@ -397,8 +397,13 @@ export function usePushFigmaSync() {
 		const preferences = getPresetPreferences();
 
 		await Promise.allSettled([
-			handleClassesRefresh({ cssObjects, preset, ...wpApiProxyProps }),
-			handleColorsRefresh({ preset, ...wpApiProxyProps }),
+			handleClassesRefresh({ cssObjects, classPrefix: preset.classPrefix, preset, ...wpApiProxyProps }),
+			handleColorsRefresh({
+				classPrefix: preset.classPrefix,
+				variablePrefix: preset.variablePrefix,
+				preset,
+				...wpApiProxyProps,
+			}),
 			handleCssGeneratorPrefixed({
 				cssObjects,
 				classPrefix: preset.classPrefix,

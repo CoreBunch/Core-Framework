@@ -23,35 +23,45 @@ export function usePushFigma() {
 	}
 
 	const syncWp = async (props: HandleFigmaPushProps) => {
-		const { url } = extractApiKey(figma.apiKey);
+		// The save button spins until setIsLoading(false), so every exit must reach
+		// the finally, and every failure must say so rather than end in silence.
+		try {
+			const { url } = extractApiKey(figma.apiKey);
 
-		window.parent.postMessage(
-			{
-				type: "cf-push",
-				payload: {
-					preset: props.newPresetData,
-					colorVariables: props.colorVariables,
+			window.parent.postMessage(
+				{
+					type: "cf-push",
+					payload: {
+						preset: props.newPresetData,
+						colorVariables: props.colorVariables,
+					},
 				},
-			},
-			"*",
-		);
+				"*",
+			);
 
-		const wpApiProxyProps: WpApiProxyProps = {
-			apiKey: figma.apiKey,
-			url,
-		};
+			const wpApiProxyProps: WpApiProxyProps = {
+				apiKey: figma.apiKey,
+				url,
+			};
 
-		const [cssResponse, presetResponse] = await Promise.all([
-			syncCSSWithFigma({ cssString: props.cssString, ...wpApiProxyProps }),
-			updatePresetWithFigma({ newPresetData: props.newPresetData, ...wpApiProxyProps }),
-		]);
+			const [cssResponse, presetResponse] = await Promise.all([
+				syncCSSWithFigma({ cssString: props.cssString, ...wpApiProxyProps }),
+				updatePresetWithFigma({ newPresetData: props.newPresetData, ...wpApiProxyProps }),
+			]);
 
-		if (cssResponse && presetResponse) {
+			if (!(cssResponse && presetResponse)) {
+				toast.error("Failed to save to WordPress. Your changes were not applied.");
+				return;
+			}
+
 			await handleFigmaPushSync({ preset: props.newPresetData, ...wpApiProxyProps });
 			toast.success("Synced successfully");
+		} catch (error) {
+			console.error(error);
+			toast.error("Failed to sync with WordPress.");
+		} finally {
+			props.setIsLoading(false);
 		}
-
-		props.setIsLoading(false);
 	};
 
 	const handleFigmaPush = async (props: HandleFigmaPushProps) => {
