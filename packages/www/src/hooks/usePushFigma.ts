@@ -44,10 +44,10 @@ export function usePushFigma() {
 		const [cssResponse, presetResponse] = await Promise.all([
 			syncCSSWithFigma({ cssString: props.cssString, ...wpApiProxyProps }),
 			updatePresetWithFigma({ newPresetData: props.newPresetData, ...wpApiProxyProps }),
-			handleFigmaPushSync({ ...wpApiProxyProps }),
 		]);
 
 		if (cssResponse && presetResponse) {
+			await handleFigmaPushSync({ preset: props.newPresetData, ...wpApiProxyProps });
 			toast.success("Synced successfully");
 		}
 

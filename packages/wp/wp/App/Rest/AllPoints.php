@@ -1738,7 +1738,23 @@ class AllPoints extends Base {
 			);
 		}
 
-		$new_selectors_array = explode( ',', $classes ) ?? array();
+		if ( is_string( $classes ) ) {
+			$classes = explode( ',', $classes );
+		}
+
+		$new_selectors_array = is_array( $classes )
+			? array_values(
+				array_unique(
+					array_filter(
+						array_map(
+							fn( $class ): string => is_string( $class ) ? trim( $class ) : '',
+							$classes
+						),
+						fn( $class ): bool => '' !== $class
+					)
+				)
+			)
+			: array();
 		$builder_array       = array(
 			'oxygen' => array(
 				'is_active'     => CoreFrameworkOxygen()->is_oxygen(),

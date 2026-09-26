@@ -1,6 +1,6 @@
 export const postMessageToIframe = (type: string, payload: Record<string, unknown>) => {
 	const iframe = document.getElementById("web-app") as HTMLIFrameElement | null;
-	iframe?.contentWindow?.postMessage({ type, ...payload }, "*");
+	iframe?.contentWindow?.postMessage({ ...payload, type }, "*");
 };
 
 export const isMessageFromEditor = (event: MessageEvent) => {

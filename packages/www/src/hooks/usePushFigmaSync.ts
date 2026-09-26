@@ -20,14 +20,12 @@ import { getFirstSelector } from "components/modules/components/Components.edito
 import { cssGenerator } from "cssGenerator";
 import {
 	colorSystemFormDataAtom,
-	getPresetFromCurrentPresetAtom,
 	joinedStylesAtom,
 	presetPreferencesSelector,
 } from "state";
 
 export function usePushFigmaSync() {
 	const getJoinedStyles = useAtomCallback(useCallback((get) => get(joinedStylesAtom), []));
-	const getNewPreset = useAtomCallback(useCallback((get) => get(getPresetFromCurrentPresetAtom), []));
 	const getPresetPreferences = useAtomCallback(useCallback((get) => get(presetPreferencesSelector), []));
 	const getColorSystemFormDataAtom = useAtomCallback(useCallback((get) => get(colorSystemFormDataAtom), []));
 
@@ -85,10 +83,8 @@ export function usePushFigmaSync() {
 			classAccumulator.push(themeInvertedClass);
 		}
 
-		if (!classAccumulator.length) {
-			return;
-		}
-
+		// The classes endpoint also refreshes builder variables, so it must run for
+		// projects whose stylesheet contains variables but no class selectors.
 		await Promise.allSettled([
 			updateGroupedClasses({
 				groupedClassNames: getClassNamesGroupedByGroups(preset),
@@ -390,28 +386,26 @@ export function usePushFigmaSync() {
 		}
 	}
 
-	interface IHandleFigmaPushSync extends WpApiProxyProps {}
+	interface IHandleFigmaPushSync extends WpApiProxyProps {
+		readonly preset: Preset;
+	}
 
 	const handleFigmaPushSync = useCallback(async (props: IHandleFigmaPushSync) => {
-		const preset = getNewPreset();
-
-		if (!preset) {
-			return;
-		}
+		const { preset, ...wpApiProxyProps } = props;
 
 		const cssObjects = getJoinedStyles();
 		const preferences = getPresetPreferences();
 
 		await Promise.allSettled([
-			handleClassesRefresh({ cssObjects, preset, ...props }),
-			handleColorsRefresh({ preset, ...props }),
+			handleClassesRefresh({ cssObjects, preset, ...wpApiProxyProps }),
+			handleColorsRefresh({ preset, ...wpApiProxyProps }),
 			handleCssGeneratorPrefixed({
 				cssObjects,
 				classPrefix: preset.classPrefix,
 				variablePrefix: preset.variablePrefix,
 				minScreenWidth: preferences.min_screen_width,
 				maxScreenWidth: preferences.max_screen_width,
-				...props,
+				...wpApiProxyProps,
 			}),
 			handleOxygenHelperStyleSheetGenerator({
 				preset,
@@ -419,10 +413,10 @@ export function usePushFigmaSync() {
 				variablePrefix: preset.variablePrefix,
 				minScreenWidth: preferences.min_screen_width,
 				maxScreenWidth: preferences.max_screen_width,
-				...props,
+				...wpApiProxyProps,
 			}),
 		]);
-	}, [getJoinedStyles, getNewPreset, getPresetPreferences, handleClassesRefresh, handleColorsRefresh, handleCssGeneratorPrefixed, handleOxygenHelperStyleSheetGenerator]);
+	}, [getJoinedStyles, getPresetPreferences, handleClassesRefresh, handleColorsRefresh, handleCssGeneratorPrefixed, handleOxygenHelperStyleSheetGenerator]);
 
 	return {
 		handleFigmaPushSync,
