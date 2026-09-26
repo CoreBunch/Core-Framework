@@ -1489,14 +1489,16 @@ interface Font {
 					colorsWrapper.appendChild(main);
 
 					const shades =
-						color.shades?.map((shade, index) => {
-							const darkColor = color.darkShades?.[index]?.value;
-							return this.createColorButton({
-								variable: shade.name,
-								color: shade.value,
-								darkColor,
-							});
-						}) ?? [];
+						color.isShades && color.shades
+							? color.shades.map((shade, index) => {
+									const darkColor = color.darkShades?.[index]?.value;
+									return this.createColorButton({
+										variable: shade.name,
+										color: shade.value,
+										darkColor,
+									});
+								})
+							: [];
 
 					if (shades.length) {
 						const title = document.createElement("div");
@@ -1514,14 +1516,16 @@ interface Font {
 					}
 
 					const tints =
-						color.tints?.map((tint, index) => {
-							const darkColor = color.darkTints?.[index]?.value;
-							return this.createColorButton({
-								variable: tint.name,
-								color: tint.value,
-								darkColor,
-							});
-						}) ?? [];
+						color.isTints && color.tints
+							? color.tints.map((tint, index) => {
+									const darkColor = color.darkTints?.[index]?.value;
+									return this.createColorButton({
+										variable: tint.name,
+										color: tint.value,
+										darkColor,
+									});
+								})
+							: [];
 
 					if (tints.length) {
 						const title = document.createElement("div");
