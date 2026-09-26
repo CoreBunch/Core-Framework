@@ -1,0 +1,11 @@
+{
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"name": "www",
+			"runtimeExecutable": "bun",
+			"runtimeArgs": ["run", "dev:www"],
+			"port": 5173
+		}
+	]
+}

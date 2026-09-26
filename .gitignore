@@ -54,5 +54,14 @@ composer.lock
 
 # Claude-related files
 CLAUDE.sessions.md
-.claude/
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/run-and-test/
+!.claude/skills/maintain/
+!.claude/skills/release/
+!.claude/launch.json
 sessions/
+
+# Worktrees
+.worktrees/
