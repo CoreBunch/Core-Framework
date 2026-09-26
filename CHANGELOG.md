@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.1.0]
+
+### Changed
+
+- Core Framework now requires WordPress 6.6 or newer. The block editor integration is built against the `react-jsx-runtime` script that WordPress first ships in 6.6. Sites on WordPress 6.0 to 6.5 should stay on Core Framework 2.0.2.
+
+### Fixed
+
+- Fixed the block editor going blank with the Core Framework Gutenberg integration enabled. The editor script was loaded with an outdated, hard-coded dependency list that left out WordPress's `react-jsx-runtime`, so rendering the Core Framework class panel threw on an undefined `ReactJSXRuntime` and took the whole editor down. The script now loads the dependencies its build declares.
+
 ## [2.0.2] - 2026-08-28
 
 ### Fixed

@@ -262,17 +262,33 @@ class Functions extends Base {
 	public function enqueue_scripts() {
 		CoreFramework()->enqueue_core_framework_connector();
 
-		$version = $this->plugin->version();
+		$script_path       = plugin_dir_path( CORE_FRAMEWORK_ABSOLUTE ) . 'gutenberg/index.js';
+		$script_asset_path = plugin_dir_path( CORE_FRAMEWORK_ABSOLUTE ) . 'gutenberg/index.asset.php';
+		$script_asset      = array(
+			'dependencies' => array(
+				'react',
+				'react-jsx-runtime',
+				'wp-block-editor',
+				'wp-components',
+				'wp-compose',
+				'wp-data',
+				'wp-element',
+				'wp-plugins',
+			),
+			'version'      => \file_exists( $script_path )
+				? \filemtime( $script_path )
+				: $this->plugin->version(),
+		);
 
-		if ( \file_exists( plugin_dir_path( CORE_FRAMEWORK_ABSOLUTE ) . 'gutenberg/index.js' ) ) {
-			$version = \filemtime( plugin_dir_path( CORE_FRAMEWORK_ABSOLUTE ) . 'gutenberg/index.js' );
+		if ( \file_exists( $script_asset_path ) ) {
+			$script_asset = require $script_asset_path;
 		}
 
 		wp_enqueue_script(
 			'core-framework-gutenberg-plugin',
 			plugins_url( 'gutenberg/index.js', CORE_FRAMEWORK_ABSOLUTE ),
-			array( 'wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor' ),
-			$version,
+			$script_asset['dependencies'],
+			$script_asset['version'],
 			true
 		);
 	}

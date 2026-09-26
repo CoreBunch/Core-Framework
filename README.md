@@ -10,7 +10,7 @@ Core Framework is a visual CSS framework and design-token builder for the web, W
 [![GitHub stars](https://img.shields.io/github/stars/corebunch/core-framework?style=flat&label=stars&labelColor=171923&color=ffd43b)](https://github.com/corebunch/core-framework/stargazers)
 [![License: MIT](https://img.shields.io/badge/license-MIT-5c62ff?labelColor=171923)](LICENSE)
 [![Runtime: Bun](https://img.shields.io/badge/runtime-Bun-f9f1e1?labelColor=171923)](https://bun.sh)
-[![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-21759b?labelColor=171923)](https://wordpress.org/plugins/core-framework/)
+[![WordPress](https://img.shields.io/badge/WordPress-6.6%2B-21759b?labelColor=171923)](https://wordpress.org/plugins/core-framework/)
 
 [Website](https://coreframework.com) · [Product tour](#product-tour) · [Quick start](#quick-start) · [Documentation](https://docs.coreframework.com) · [Contributing](CONTRIBUTING.md) · [Marketplace](https://coreframework.com/marketplace)
 
@@ -219,7 +219,7 @@ Then publish `packages/www/dist` at the matching path, such as `https://example.
 
 ## WordPress development
 
-Requirements: WordPress 6.0 or newer, PHP 8.0 or newer, Composer, Bun 1.3.x, and a local HTTPS certificate.
+Requirements: WordPress 6.6 or newer, PHP 8.0 or newer, Composer, Bun 1.3.x, and a local HTTPS certificate.
 
 1. Link the plugin package into your WordPress installation:
 
