@@ -128,13 +128,20 @@ cd .worktrees/<slug>
 bun install --frozen-lockfile
 ```
 
-**`bun install` is the only setup a worktree needs.** About 7s with a warm bun cache, 3690 packages. Verified from a clean worktree: `dev:www` boots and reaches the editor, `test:www` passes 147/147, and the full `e2e:wp` passes — `e2e:wp` needs no `.env` because it builds a release ZIP and runs it in Docker.
+`bun install` is all that `dev:www`, `test:www`, and `e2e:wp` need. About 7s with a warm bun cache, 3690 packages. Verified from a clean worktree: `dev:www` boots and reaches the editor, `test:www` passes 147/147, and the full `e2e:wp` passes — `e2e:wp` needs no `.env` because it builds a release ZIP and runs it in Docker.
 
-You only need to copy `packages/wp/.env` (gitignored) if you intend to run `dev:wp` against a local WordPress from the worktree.
+**It is not enough for the full gate.** Two things break in a fresh worktree:
+
+- **The first `bun run build:wp` exits 1** with *"Missing: APP_ENV / Created: APP_ENV='development' / Please, start project again."* `packages/wp/.env` is gitignored, so a new worktree has none; `packages/wp/vite.config.js:13-19` creates it with `APP_ENV='development'` and bails. Run `build:wp` a second time and it succeeds (and flips the new file to `production`). That first exit 1 is setup, not a regression.
+- **`bun run check:open-source` crashes with `ENOENT … scandir '<worktree>/packages/figma/dist'`** (or `packages/wp/dist`) until both bundles exist. It scans the built output, so run `build:figma` and `build:wp` first — the gate below is ordered for this.
+
+Copy `packages/wp/.env` from `.env.example` (rather than letting the build create a bare one) only if you intend to run `dev:wp` against a local WordPress from the worktree.
 
 ## The verification gate
 
 Run this **once, at the end**, not after every edit. Capture exit codes directly — piping into `tail` or `grep` reports the pipe's status and will show green over a failed build.
+
+**The order matters.** `check:open-source` scans `packages/wp/dist` and `packages/figma/dist`, so it must come after `build:wp` and `build:figma`; run it first and it dies on `ENOENT`, not on a boundary violation. In a fresh worktree, expect `BUILD_WP=1` on the first pass (see Worktrees) and rerun it.
 
 ```bash
 bun run test:www      > /tmp/t.log  2>&1; echo "TEST=$?"
@@ -153,12 +160,15 @@ bun run e2e:wp        > /tmp/e2e.log 2>&1; echo "E2E=$?"
 
 Scale it to the change: a www-only change does not need `e2e:wp`; anything touching `packages/core`, `packages/wp`, or the release scripts does.
 
-`bun run check:open-source` is an **architecture gate**, not a lint — see `maintain` for what it forbids and why. CI runs it on the built `wp` and `figma` bundles too, so it can fail on output that looks fine in source.
+`bun run check:open-source` is an **architecture gate**, not a lint — see `maintain` for what it forbids and why. It checks the built bundles as well as source, so it can fail on output that looks fine in source. On a PR it runs only inside `e2e:wp` (`scripts/build-wp-release.ts:87-88`, source and `wp`); the full `all` run, `figma` bundle included, happens in the tag release workflow after both builds.
+
+It deliberately does **not** skip a missing `dist`. A skip would print "passed for all" having never read the bundles — exactly the green-over-nothing this gate exists to prevent. Build first instead.
 
 ## Traps that make a run misleading
 
 - **`bun run lint` rewrites your files.** Both packages run `biome check --write --unsafe`. It is a formatter-with-fixes, not a read-only check; run it deliberately and read the resulting diff. `bun run format` (prettier over every package) also writes.
 - **`build:wp` rewrites `packages/wp/.env` to `production`** (via `env:prod`), and `dev:wp`/`start` rewrites it back to `development` (via `env:dev`). An unexpected `.env` diff is usually this, not your change. Note `release:wp` and `e2e:wp` do **not** touch the file — they pass `APP_ENV` as an environment variable instead (`scripts/build-wp-release.ts:85-86`), so a stale `production` in `.env` came from a previous `build:wp`, not from the release path.
+- **The first `build:wp` in a fresh worktree exits 1** because `packages/wp/.env` does not exist yet; it creates the file and the second run passes. **`check:open-source` before the builds dies on `ENOENT`.** Both are setup, not regressions — see Worktrees.
 - **`e2e:wp` fails fast and loudly without Docker** — "Docker is required for the WordPress end-to-end test." That is an environment problem, not a regression.
 - **The type-check lives in the build**, not in the tests. `test:www` passing tells you nothing about types.
 - **`test:www` is the only coverage for `packages/core`.** A green WordPress PHP suite says nothing about shared logic.
