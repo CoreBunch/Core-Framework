@@ -65,6 +65,12 @@ Jest with coverage, 23 suites / 147 tests, about 4s. This is the **only** automa
 
 Build is `tsc && vite build` — the type-check is part of the build, so a change that runs in dev can still fail `build:www`.
 
+### The hosted build and the embed
+
+Vercel builds the hosted editor from `packages/www/vercel.json` (see `release`). To reproduce it exactly, run its two commands from `packages/www` in a clean checkout: `bunx bun@1.3.11 install --frozen-lockfile`, then `bunx bun@1.3.11 run build`. Install works from the package directory because bun resolves the workspace root and its `bun.lock`.
+
+coreframework.com/app runs the editor inside an iframe, which switches on the embed code paths (`isEmbed()`: save posts `cf-push` to the parent instead of writing `localStorage`). A plain `dev:www` tab never exercises them. To test them, serve a small host page on another port that iframes `http://localhost:5173/` and plays the website's side: answer `cf-ready` with `cf-embed-load-preset` (`{ preset: <JSON string>, isViewOnly }`) or `cf-embed-load-preset-default`, answer `cf-push` with `cf-push-response` (`{ success }`), and answer `cf-read-clipboard` with `{ type: "cf-read-clipboard", text }`. The website's side lives in the private repo `OxyNinja/CoreFramework.com`, `src/pages/app/[slug].tsx`.
+
 ## packages/wp — the WordPress plugin
 
 ### PHP tests, and the trap that makes them look broken
@@ -131,6 +137,8 @@ bun install --frozen-lockfile
 **`bun install` is the only setup a worktree needs.** About 7s with a warm bun cache, 3690 packages. Verified from a clean worktree: `dev:www` boots and reaches the editor, `test:www` passes 147/147, and the full `e2e:wp` passes — `e2e:wp` needs no `.env` because it builds a release ZIP and runs it in Docker.
 
 You only need to copy `packages/wp/.env` (gitignored) if you intend to run `dev:wp` against a local WordPress from the worktree.
+
+**The first `build:wp` in a fresh worktree fails.** With no `packages/wp/.env`, its `env:prod` step creates one (`APP_ENV='development'`), prints "Please, start project again." and exits 1. Run `build:wp` a second time and it passes. `check:open-source` then needs the `wp` and `figma` builds to exist: it fails with `ENOENT ... packages/figma/dist` if they have not been built in this checkout.
 
 ## The verification gate
 
