@@ -1,5 +1,6 @@
 export * from "@core-framework/core/utils";
 
+import { EMBED_READ_CLIPBOARD, waitForEmbedMessage } from "functions/embedBridge";
 import { isEmbed } from "functions/isEmbed";
 
 export async function copyToClipboard(text: string): Promise<boolean> {
@@ -25,23 +26,10 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 
 export async function readClipboard() {
 	if (isEmbed()) {
-		return new Promise<string>((resolve) => {
-			window.parent.postMessage(
-				{
-					type: "cf-read-clipboard",
-				},
-				"*",
-			);
-			window.addEventListener(
-				"message",
-				(event) => {
-					if (event.data.type === "cf-read-clipboard") resolve(event.data.text);
-				},
-				{
-					once: true,
-				},
-			);
-		});
+		const reply = waitForEmbedMessage<{ text?: string }>(EMBED_READ_CLIPBOARD);
+		window.parent.postMessage({ type: EMBED_READ_CLIPBOARD }, "*");
+
+		return (await reply)?.text ?? "";
 	}
 
 	return await navigator?.clipboard?.readText();
