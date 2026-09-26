@@ -7,6 +7,7 @@ import { useHotkeys } from "@mantine/hooks";
 import { flags } from "flags";
 import { useAtomValue, useSetAtom } from "jotai";
 import { usePush } from "hooks/usePush";
+import { embedViewOnlyAtom } from "../state/embedAtom";
 import { hasUnsavedChangesAtom, isHandleSave } from "../state/saveAtom";
 import { viewAtom } from "state";
 import { Stats } from "./Stats";
@@ -65,6 +66,7 @@ export const Side = memo(() => {
 	const setView = useSetAtom(viewAtom);
 	const canBeSaved = useAtomValue(isHandleSave);
 	const hasUnsavedChanges = useAtomValue(hasUnsavedChangesAtom);
+	const isViewOnly = useAtomValue(embedViewOnlyAtom);
 
 	const { colorVariables } = useGetColor();
 	const { handlePush, isLoading } = usePush();
@@ -126,29 +128,31 @@ export const Side = memo(() => {
 					<span>Preview CSS</span>
 				</button>
 
-				<Tooltip
-					label={"Please, save changes to apply."}
-					opened={hasUnsavedChanges && !isLoading}
-					position="bottom"
-					withArrow
-					width={200}
-					multiline
-				>
-					<button
-						id="push1"
-						onClick={() => handlePush()}
-						disabled={isLoading}
-						className={clsx("btn-primary btn-m full-width save-button", {
-							"pulse-animation": hasUnsavedChanges && !isLoading,
-							"save-button--saved": isSaved,
-						})}
+				{isViewOnly ? null : (
+					<Tooltip
+						label={"Please, save changes to apply."}
+						opened={hasUnsavedChanges && !isLoading}
+						position="bottom"
+						withArrow
+						width={200}
+						multiline
 					>
-						<span className="save-button__placeholder">Save changes</span>
-						<span className="save-button__roll">
-							<RollingContent current={rollingContent} />
-						</span>
-					</button>
-				</Tooltip>
+						<button
+							id="push1"
+							onClick={() => handlePush()}
+							disabled={isLoading}
+							className={clsx("btn-primary btn-m full-width save-button", {
+								"pulse-animation": hasUnsavedChanges && !isLoading,
+								"save-button--saved": isSaved,
+							})}
+						>
+							<span className="save-button__placeholder">Save changes</span>
+							<span className="save-button__roll">
+								<RollingContent current={rollingContent} />
+							</span>
+						</button>
+					</Tooltip>
+				)}
 			</div>
 
 			<div className="side-bottom">

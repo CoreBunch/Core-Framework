@@ -11,6 +11,7 @@ import { Save } from "assets/icons/Save.icon";
 import { usePush } from "hooks/usePush";
 import { NAV_ITEMS, NAV_ITEMS_BOTTOM } from "constants/navItems";
 import { APP_VERSION } from "constants/version";
+import { embedViewOnlyAtom } from "../state/embedAtom";
 import { figmaAtom } from "../state/figmaAtom";
 import { currentPresetAtom, viewAtom } from "state";
 import { Tooltip } from "./ui/Tooltip";
@@ -27,6 +28,7 @@ const scrollTop = () => {
 export const Nav = memo(() => {
 	const [view, setView] = useAtom(viewAtom);
 	const figma = useAtomValue(figmaAtom);
+	const isViewOnly = useAtomValue(embedViewOnlyAtom);
 
 	const { handlePush, isLoading } = usePush();
 
@@ -50,11 +52,13 @@ export const Nav = memo(() => {
 		<nav className="nav">
 			<div className="nav-scroll-wrapper">
 				<ul>
-					<Tooltip label="Save" position="bottom-start">
-						<li id="push2" className="push btn-primary" onClick={handlePush}>
-							{isLoading ? <Loader size="small" /> : <Save />}
-						</li>
-					</Tooltip>
+					{isViewOnly ? null : (
+						<Tooltip label="Save" position="bottom-start">
+							<li id="push2" className="push btn-primary" onClick={handlePush}>
+								{isLoading ? <Loader size="small" /> : <Save />}
+							</li>
+						</Tooltip>
+					)}
 
 					{isFigma() && figma.apiKey ? (
 						<Tooltip label="Refresh" position="bottom-start">
