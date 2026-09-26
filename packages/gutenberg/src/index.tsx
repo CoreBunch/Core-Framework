@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { InspectorControls } from "@wordpress/block-editor";
 import { PanelBody, PanelRow, SearchControl, Spinner, TabPanel } from "@wordpress/components";
 import { createHigherOrderComponent } from "@wordpress/compose";
@@ -106,6 +106,9 @@ window.coreframework = {
 
 const removeDuplicates = <T extends unknown>(arr: T[]): T[] => [...new Set(arr)];
 
+const parseClassNames = (className?: string): string[] =>
+	className ? className.replace(/\s\s+/g, " ").trim().split(" ").filter(Boolean) : [];
+
 const stylesGroupsIconsMap: Record<string, React.ComponentType<any>> = {
 	colorStyles: ColorPalette,
 	typographyStyles: Typography,
@@ -200,41 +203,26 @@ const withInspectorControls = createHigherOrderComponent((BlockEdit: React.Compo
 
 		const [searchValue, setSearchValue] = useState("");
 
+		// Seed from the saved className so the first render already matches the block.
 		const [classNames, setClassNames] = useState<{
 			active: string[];
 			dynamic: string[];
-		}>({
-			active: [],
+		}>(() => ({
+			active: parseClassNames(props.attributes.className),
 			dynamic: [],
-		});
+		}));
 
 		const [selectedSearchResult, setSelectedSearchResult] = useState(-1);
 
-		const isInitialMount = useRef(true);
-
 		useEffect(() => {
-			if (!props.attributes.className) {
+			const className = [...classNames.active, ...classNames.dynamic].join(" ");
+
+			// Any differing write, even "" over no className or a whitespace-only change, marks a clean post, template or template part as modified.
+			if (className === parseClassNames(props.attributes.className).join(" ")) {
 				return;
 			}
 
-			const regExpToRemoveMultipleSpaces = /\s\s+/g;
-			const parsedClassNames = props.attributes.className.replace(regExpToRemoveMultipleSpaces, " ").trim();
-			const initialClassNames = parsedClassNames.split(" ");
-			setClassNames((prev) => ({
-				...prev,
-				active: initialClassNames,
-			}));
-		}, []);
-
-		useEffect(() => {
-			if (isInitialMount.current) {
-				isInitialMount.current = false;
-				return;
-			}
-
-			props.setAttributes({
-				className: [...classNames.active, ...classNames.dynamic].join(" "),
-			});
+			props.setAttributes({ className });
 		}, [classNames]);
 
 		useEffect(() => {
