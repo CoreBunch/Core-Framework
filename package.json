@@ -26,6 +26,7 @@
 		"fast-uri": "3.1.5",
 		"flatted": "3.4.4",
 		"follow-redirects": "1.16.0",
+		"handlebars": "4.7.10",
 		"http-proxy-middleware": "2.0.10",
 		"ip-address": "10.5.0",
 		"js-yaml": "4.3.1",
@@ -35,6 +36,8 @@
 		"micromatch": "4.0.8",
 		"nanoid": "3.3.18",
 		"postcss": "8.5.26",
+		"proxy-addr": "2.0.8",
+		"shell-quote": "1.11.0",
 		"svgo": "3.3.4",
 		"websocket-driver": "0.7.5",
 		"yaml": "1.10.3"
