@@ -1,3 +1,4 @@
+import { refreshColorReferences } from "./refreshColorReferences";
 import { ColorItem, Shade, SingleColorReducerAction } from "../types";
 import { colord } from "colord";
 import { convertToDesiredColorFormat } from "utils";
@@ -6,6 +7,8 @@ import { getColor } from "./getColor";
 
 export const singleColorReducer = (state: ColorItem, action: SingleColorReducerAction): ColorItem => {
 	switch (action.type) {
+		case "refreshReferences":
+			return refreshColorReferences(state, action.payload.previousVariables, action.payload.colorVariables);
 		case "restore":
 			return action.payload;
 		case "rename": {
@@ -28,17 +31,14 @@ export const singleColorReducer = (state: ColorItem, action: SingleColorReducerA
 		}
 		case "updateColor": {
 			const { value, colorVariables } = action.payload;
-			const isRaw = state.format === "raw";
 
 			return {
 				...state,
 				value,
 				...(state.isShades
-					? { shades: generateWithCheck(state, isRaw ? getColor(value, colorVariables) : value, "shade") }
+					? { shades: generateWithCheck(state, value, "shade", false, colorVariables) }
 					: {}),
-				...(state.isTints
-					? { tints: generateWithCheck(state, isRaw ? getColor(value, colorVariables) : value, "tint") }
-					: {}),
+				...(state.isTints ? { tints: generateWithCheck(state, value, "tint", false, colorVariables) } : {}),
 			};
 		}
 		case "updateFormat": {
@@ -49,7 +49,7 @@ export const singleColorReducer = (state: ColorItem, action: SingleColorReducerA
 			const colorInDesiredFormat = convertToDesiredColorFormat(colorInstance, format);
 
 			const colorDarkInstance =
-				isDarkMode && darkValue ? colord(getColor(darkValue, colorVariables, false, true)) : colorInstance;
+				isDarkMode && darkValue ? colord(getColor(darkValue, colorVariables, true)) : colorInstance;
 			const colorDarkInDesiredFormat =
 				isDarkMode && darkValue
 					? convertToDesiredColorFormat(colorDarkInstance, format)
@@ -74,27 +74,12 @@ export const singleColorReducer = (state: ColorItem, action: SingleColorReducerA
 		case "updateDarkColor": {
 			const { value, colorVariables } = action.payload;
 			if (!value) return state;
-			const isRaw = state.format === "raw";
 
 			return {
 				...state,
 				darkValue: value,
-				darkShades: state.isShades
-					? generateWithCheck(
-							state,
-							isRaw ? getColor(value, colorVariables, false, true) : value,
-							"shade",
-							true,
-					  )
-					: [],
-				darkTints: state.isTints
-					? generateWithCheck(
-							state,
-							isRaw ? getColor(value, colorVariables, false, true) : value,
-							"tint",
-							true,
-					  )
-					: [],
+				darkShades: state.isShades ? generateWithCheck(state, value, "shade", true, colorVariables) : [],
+				darkTints: state.isTints ? generateWithCheck(state, value, "tint", true, colorVariables) : [],
 			};
 		}
 	}

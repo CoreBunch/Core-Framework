@@ -1,7 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Book } from "../assets/icons/Book.icon";
 import { useChangeDetection } from "../hooks/useChangeDetection";
-import { useGetColor } from "../hooks/useGetColor";
 import { clsx } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
 import { flags } from "flags";
@@ -12,7 +11,6 @@ import { hasUnsavedChangesAtom, isHandleSave } from "../state/saveAtom";
 import { viewAtom } from "state";
 import { Stats } from "./Stats";
 import { Loader } from "./basic/Loader";
-import { UpdatedWindow } from "./modules/colorSystem";
 import { Tooltip } from "./ui/Tooltip";
 
 type RollingContentItem = {
@@ -65,7 +63,6 @@ export const Side = memo(() => {
 	const canBeSaved = useAtomValue(isHandleSave);
 	const hasUnsavedChanges = useAtomValue(hasUnsavedChangesAtom);
 
-	const { colorVariables } = useGetColor();
 	const { handlePush, state } = usePush();
 
 	// Use the change detection hook
@@ -140,7 +137,6 @@ export const Side = memo(() => {
 			<div className="grid gap-s">
 				<button
 					onClick={() => {
-						(window as unknown as UpdatedWindow).colorVariables = colorVariables;
 						setView("PREVIEW");
 					}}
 					className={"btn-tertiary btn-m full-width"}

@@ -71,6 +71,8 @@ The project schema is defined in the shared core and describes:
 - breakpoints and responsive settings
 - project preferences and version information
 
+Color shade/tint entries support an optional `isCustom` flag: `false` identifies an automatically generated swatch, `true` preserves a manual edit, and an absent flag represents older data with unknown edit history. Reset returns a swatch to automatic generation. Loading a preset refreshes known automatic variants of RAW variable references using the current color data, while preserving custom and unclassified older swatches. This normalization is independent of the existing versioned migrations; older presets remain valid without the new field, and color IDs and variant names are unchanged.
+
 The usual load flow is:
 
 1. Load project data from browser storage, WordPress, or an explicit import.
