@@ -5,7 +5,7 @@ Core Framework uses a tag-driven release process for the WordPress and Figma plu
 ## Release flow
 
 1. Keep `main` releasable and make sure CI is green.
-2. Run `bun run bump`, then update the changelog.
+2. Run `bun run bump`, date the release's section in `CHANGELOG.md`, and copy its user-facing notes into a matching `= X.Y.Z =` entry under `== Changelog ==` in `packages/wp/readme.txt`. Include upgrade instructions and breaking changes so users can read them in WordPress's plugin details without visiting GitHub.
 3. Commit the release changes to `main`.
 4. Create and push a semantic version tag such as `v2.0.0`.
 5. GitHub Actions verifies the repository and builds versioned WordPress and Figma release bundles.
@@ -36,6 +36,8 @@ git push origin v2.0.0
 ```
 
 The tag version must exactly match the WordPress plugin header, package metadata (including `packages/figma/package.json`), Core Framework version constant, and WordPress.org stable tag. The release builders reject mismatches.
+
+The WordPress builder also rejects a missing or empty changelog entry for that version in `packages/wp/readme.txt`. It copies that readme into the release ZIP and WordPress.org deployment. Verify the notes alongside the new stable tag after publishing.
 
 The release builders also reject retired hosted-service URLs, remote placeholder images, the removed remote interface font, and stale Figma version copy. They generate a production dependency license inventory for each artifact.
 

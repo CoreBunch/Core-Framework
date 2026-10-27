@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Restored the missing 2.0.2 release notes in the WordPress plugin readme. Future WordPress packages now require a changelog entry for their version so update notes remain available in WordPress's plugin details.
 - Fixed importing a local font into WordPress failing with a Google Font download error. Custom fonts now upload the selected file directly instead of trying to find it on Google Fonts.
 - Fixed Figma synchronization stopping when a RAW color referenced another variable without a dark-mode value. Light and dark colors now resolve independently, so mixed literal and referenced colors keep their correct values.
 - Fixed Bricks sites hanging when removed Core Framework classes were cleaned up. The initial lookup joined post metadata five times, multiplying rows on sites with many metadata entries. It now checks all five Bricks metadata keys through one join while retaining the existing batched cleanup.

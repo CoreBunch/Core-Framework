@@ -57,6 +57,14 @@ async function getReleaseVersion(): Promise<string> {
 		}
 	}
 
+	const readme = await readFile(join(WP_DIR, "readme.txt"), "utf8");
+	const changelog = readme.split(/^== Changelog ==\s*$/m)[1]?.split(/^== /m)[0];
+	const releaseHeading = new RegExp(`^= ${version.replaceAll(".", "\\.")} =\\s*$`, "m");
+	const releaseNotes = changelog?.split(releaseHeading)[1]?.split(/^= /m)[0];
+	if (!releaseNotes?.trim()) {
+		fail(`packages/wp/readme.txt needs a non-empty Changelog entry for ${version} before packaging`);
+	}
+
 	return version;
 }
 

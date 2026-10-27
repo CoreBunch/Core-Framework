@@ -35,7 +35,8 @@ On 2026-09-26 the project was found still connected to the old private repo `Oxy
 1. **On `main`, clean tree, CI green.** `scripts/release.ts` enforces branch and cleanliness and stops otherwise.
 2. **Version bumped via `bun run bump`.** One constant, `APP_VERSION` in `packages/core/src/constants/version.ts`, drives ten pinned files — see `maintain` → *Registries*. The release builders reject a tag that does not match all of them, including `packages/wp/readme.txt`'s WordPress.org stable tag.
 3. **Changelog closed.** Per `maintain`, entries are written per change, so release only *verifies*. Confirm every PR merged since the last tag is either present or justifiably absent, then close the open version by **adding its date** to the existing dateless heading. Nothing else moves. If you are authoring entries from `git log` at this point, the discipline failed upstream — say so.
-4. **The gate passes.** See `run-and-test`. Docker must be running for `e2e:wp`.
+4. **WordPress release notes included.** Copy the release's user-facing notes, including upgrade instructions and breaking changes, into a matching `= X.Y.Z =` entry under `== Changelog ==` in `packages/wp/readme.txt`. The WordPress builder rejects a missing or empty entry for the version being packaged; a link to GitHub does not replace these notes.
+5. **The gate passes.** See `run-and-test`. Docker must be running for `e2e:wp`.
 
 ## Cutting it
 
@@ -79,7 +80,7 @@ Reverting means shipping a *new, higher* version. Plan accordingly.
 
 ## Verifying a release actually landed
 
-- WordPress.org shows the new stable tag, matching `packages/wp/readme.txt`.
+- WordPress.org shows the new stable tag and its release notes, matching `packages/wp/readme.txt`.
 - The GitHub Release carries **both** `core-framework-X.Y.Z.zip` and `core-framework-figma-X.Y.Z.zip`.
 - The `publish` job succeeded — a green `verify` alone means nothing shipped.
 - Figma Community still shows the old version until David publishes by hand. Report that as outstanding, not done.
