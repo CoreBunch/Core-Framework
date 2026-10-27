@@ -1,4 +1,5 @@
 import { WpApiProxyProps, syncCSSWithFigma, updatePresetWithFigma } from "functions/wpdb-proxy";
+import { saveFigmaProject } from "functions/saveFigmaProject";
 import { useAtomValue } from "jotai";
 import { toast } from "sonner";
 import { ColorVariable } from "components/modules/colorSystem/types";
@@ -56,20 +57,14 @@ export function usePushFigma() {
 
 	const handleFigmaPush = async (props: HandleFigmaPushProps) => {
 		if (!figma.apiKey) {
-			window.parent.postMessage(
-				{
-					type: "cf-push-local",
-					payload: {
-						preset: props.newPresetData,
-						colorVariables: props.colorVariables,
-					},
-				},
-				"*",
-			);
-			await new Promise((resolve) => setTimeout(resolve, 200));
-			props.setIsLoading(false);
-			console.log("Synced successfully");
-			toast.success("Synced successfully");
+			try {
+				await saveFigmaProject({ preset: props.newPresetData, colorVariables: props.colorVariables });
+				toast.success("Synced successfully");
+			} catch (error) {
+				toast.error(error instanceof Error ? error.message : "Failed to save the local Figma project.");
+			} finally {
+				props.setIsLoading(false);
+			}
 			return;
 		}
 

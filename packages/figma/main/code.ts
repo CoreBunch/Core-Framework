@@ -1,4 +1,5 @@
 import { SimpleVariable } from "../src/types";
+import { readLocalProject, saveLocalProject } from "./localProjectStorage";
 import {
 	ALLOWED_REST_ROUTES,
 	PRESET_REST_ROUTE,
@@ -9,7 +10,6 @@ import {
 } from "./wordpressConnection";
 
 const PRESET_API_KEY_STORAGE_KEY = "cf_plugin_project_api_key";
-const PRESET_LOCAL_STORAGE_KEY = "cf_plugin_project_local";
 
 interface PresetResponse {
 	success?: boolean;
@@ -139,12 +139,15 @@ figma.ui.onmessage = async (msg) => {
 			await handleWordPressRequest(msg);
 			break;
 		}
+		case "save-project-locally":
 		case "add-variables": {
+			const isLocalSave = msg.type === "save-project-locally";
 			try {
 				const variables = msg?.variables as SimpleVariable[];
 				const currentVarNames = variables.map((variable) => variable.variable);
+				if (isLocalSave) saveLocalProject(figma.root, msg.payload?.preset);
 				const localCollections = [...(await figma.variables.getLocalVariableCollectionsAsync())];
-				const localVariables = await figma.variables.getLocalVariablesAsync();
+				const allLocalVariables = await figma.variables.getLocalVariablesAsync();
 
 				let coreFrameworkVariableCollection = localCollections.find(
 					(collection) => collection.name === CORE_FRAMEWORK_COLLECTION_NAME,
@@ -157,6 +160,9 @@ figma.ui.onmessage = async (msg) => {
 				}
 
 				const defaultModeId = coreFrameworkVariableCollection.modes[0].modeId;
+				const localVariables = allLocalVariables.filter(
+					(variable) => variable.variableCollectionId === coreFrameworkVariableCollection.id,
+				);
 
 				for (const { variable, value, type, webSyntax } of variables) {
 					try {
@@ -179,6 +185,8 @@ figma.ui.onmessage = async (msg) => {
 						console.warn("Failed to set variable");
 						console.warn({ variable, value, type, webSyntax });
 						console.error(e);
+						if (isLocalSave)
+							throw new Error(`Project saved, but failed to update Figma variable "${variable}".`);
 					}
 				}
 
@@ -186,12 +194,22 @@ figma.ui.onmessage = async (msg) => {
 					currentVarNames.includes(variableNode.name) || variableNode.remove();
 				});
 
-				figma.ui.postMessage({
-					type: "added-variables",
-				});
+				figma.ui.postMessage(
+					isLocalSave
+						? { type: "save-project-locally-response", requestId: msg.requestId, success: true }
+						: { type: "added-variables" },
+				);
 			} catch (e) {
 				console.warn("Failed to add variables");
 				console.warn(e);
+				if (isLocalSave) {
+					figma.ui.postMessage({
+						type: "save-project-locally-response",
+						requestId: msg.requestId,
+						success: false,
+						error: e instanceof Error ? e.message : "Failed to save the local Figma project",
+					});
+				}
 			}
 
 			break;
@@ -217,22 +235,19 @@ figma.ui.onmessage = async (msg) => {
 			}
 			break;
 		}
-		case "save-project-locally": {
-			const preset = msg.payload?.preset;
-			if (preset) {
-				figma.root.setPluginData(PRESET_LOCAL_STORAGE_KEY, JSON.stringify(preset));
-			}
-			break;
-		}
 		case "get-project-locally": {
-			const serializedPreset = figma.root.getPluginData(PRESET_LOCAL_STORAGE_KEY);
 			let preset = null;
-			if (serializedPreset) {
-				try {
-					preset = JSON.parse(serializedPreset);
-				} catch (error) {
-					console.warn("Failed to read the local Core Framework project", error);
-				}
+			try {
+				preset = readLocalProject(figma.root);
+			} catch (error) {
+				console.warn("Failed to read the local Core Framework project", error);
+				figma.ui.postMessage({
+					type: "get-project-locally",
+					preset: null,
+					error:
+						"Could not read the saved local project. Try reopening the plugin before starting a new project.",
+				});
+				break;
 			}
 			figma.ui.postMessage({ type: "get-project-locally", preset });
 			break;
