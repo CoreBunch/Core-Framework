@@ -1,4 +1,5 @@
-import { ColorItem } from "../types";
+import { ColorItem, ColorVariable } from "../types";
+import { getColor } from "./getColor";
 import { generateShades, generateTints } from "./generateShadesTints";
 
 interface GetColorOnIndexProps {
@@ -6,13 +7,14 @@ interface GetColorOnIndexProps {
 	readonly index: number;
 	readonly type: "shade" | "tint";
 	readonly dark?: boolean;
+	readonly colorVariables?: ColorVariable[];
 }
 
-export function getColorOnIndex({ state, index, type, dark }: GetColorOnIndexProps) {
+export function getColorOnIndex({ state, index, type, dark, colorVariables }: GetColorOnIndexProps) {
 	const { value, darkValue, name, shadesNumber, tintsNumber } = state;
 
 	const options = {
-		midColor: dark ? darkValue ?? value : value,
+		midColor: getColor(dark ? darkValue ?? value : value, colorVariables, dark),
 		name: name,
 		number: type === "shade" ? shadesNumber : tintsNumber,
 	};
