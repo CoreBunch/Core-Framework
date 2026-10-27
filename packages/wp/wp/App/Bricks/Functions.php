@@ -254,13 +254,15 @@ class Functions extends Base {
 			defined( 'BRICKS_DB_TEMPLATE_SETTINGS' ) ? constant( 'BRICKS_DB_TEMPLATE_SETTINGS' ) : '_bricks_template_settings',
 		);
 
-		$meta_query = array( 'relation' => 'OR' );
-		foreach ( $meta_keys as $meta_key ) {
-			$meta_query[] = array(
-				'key'     => $meta_key,
-				'compare' => 'EXISTS',
-			);
-		}
+		// Separate OR/EXISTS clauses create one postmeta join per key, multiplying
+		// rows on posts with lots of metadata. Match all keys through a single join.
+		$meta_query = array(
+			array(
+				'key'         => $meta_keys,
+				'compare_key' => 'IN',
+				'compare'     => 'EXISTS',
+			),
+		);
 
 		$post_ids = get_posts(
 			array(

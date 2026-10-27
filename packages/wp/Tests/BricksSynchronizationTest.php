@@ -68,8 +68,11 @@ if ( ! function_exists( 'get_post_types' ) ) {
 
 if ( ! function_exists( 'get_posts' ) ) {
 	function get_posts( $args = array() ) {
-		$meta_keys = array_column( array_filter( $args['meta_query'] ?? array(), 'is_array' ), 'key' );
-		$post_ids  = array();
+		$meta_keys = array();
+		foreach ( array_filter( $args['meta_query'] ?? array(), 'is_array' ) as $clause ) {
+			$meta_keys = array_merge( $meta_keys, (array) $clause['key'] );
+		}
+		$post_ids = array();
 
 		foreach ( $GLOBALS['cf_test_post_meta'] as $post_id => $post_meta ) {
 			if ( array_intersect( $meta_keys, array_keys( $post_meta ) ) ) {
@@ -445,6 +448,42 @@ final class BricksSynchronizationTest extends TestCase {
 			array( 'text-lg_c' ),
 			$GLOBALS['cf_test_options'][ BricksFunctions::BRICKS_LOCKED_CLASSES_OPTION ]
 		);
+	}
+
+	public function testReferenceSweepFindsEveryBricksMetaKeyAndSkipsUnrelatedPosts(): void {
+		$meta_keys = array(
+			'_bricks_page_header_2',
+			'_bricks_page_content_2',
+			'_bricks_page_footer_2',
+			'_bricks_page_settings',
+			'_bricks_template_settings',
+		);
+
+		foreach ( $meta_keys as $index => $meta_key ) {
+			$GLOBALS['cf_test_post_meta'][ $index + 1 ] = array(
+				$meta_key => array( '_cssGlobalClasses' => array( 'removed_c', 'keep-me' ) ),
+			);
+		}
+		$GLOBALS['cf_test_post_meta'][6] = array( '_bricks_page_content_2' => '' );
+		$GLOBALS['cf_test_post_meta'][7] = array( '_bricks_page_settings' => array() );
+		$GLOBALS['cf_test_post_meta'][8] = array(
+			'unrelated_meta' => array( '_cssGlobalClasses' => array( 'removed_c' ) ),
+		);
+
+		$method = new ReflectionMethod( BricksFunctions::class, 'remove_class_references' );
+		$method->setAccessible( true );
+		$method->invoke( $this->createBricksFunctions(), array( 'removed_c' ) );
+
+		$this->assertSame( array( range( 1, 7 ) ), $GLOBALS['cf_test_meta_primes'] );
+		foreach ( $meta_keys as $index => $meta_key ) {
+			$this->assertSame(
+				array( 'keep-me' ),
+				$GLOBALS['cf_test_post_meta'][ $index + 1 ][ $meta_key ]['_cssGlobalClasses']
+			);
+		}
+		$this->assertSame( '', $GLOBALS['cf_test_post_meta'][6]['_bricks_page_content_2'] );
+		$this->assertSame( array(), $GLOBALS['cf_test_post_meta'][7]['_bricks_page_settings'] );
+		$this->assertSame( array( 'removed_c' ), $GLOBALS['cf_test_post_meta'][8]['unrelated_meta']['_cssGlobalClasses'] );
 	}
 
 	public function testReferenceSweepIsBatchedAndRunsAfterClassesArePersisted(): void {

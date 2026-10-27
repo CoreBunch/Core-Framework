@@ -141,6 +141,33 @@ if (!is_file($path)) {
 WP_CLI::success("Generated stylesheet exists in the uploads directory.");
 '
 
+# Exercise the real WP_Query SQL builder: unit tests use a get_posts() stub.
+# Short-circuit execution so this regression check never runs a Cartesian join.
+wp_cli eval '
+$queries = array();
+$capture = static function ($posts, $query) use (&$queries) {
+	$queries[] = $query->request;
+	return array();
+};
+add_filter("posts_pre_query", $capture, 10, 2);
+try {
+	$class = new ReflectionClass(\CoreFramework\App\Bricks\Functions::class);
+	$method = $class->getMethod("remove_class_references");
+	$method->setAccessible(true);
+	$method->invoke($class->newInstanceWithoutConstructor(), array("cf-e2e-removed_c"));
+} finally {
+	remove_filter("posts_pre_query", $capture, 10);
+}
+global $wpdb;
+if (count($queries) !== 1 || substr_count($queries[0], "JOIN $wpdb->postmeta") !== 1) {
+	WP_CLI::error("Bricks reference discovery must use exactly one postmeta join.");
+}
+if (strpos($queries[0], "$wpdb->postmeta.meta_key IN (") === false) {
+	WP_CLI::error("Bricks reference discovery must filter metadata keys together.");
+}
+WP_CLI::success("Bricks reference discovery uses one postmeta join.");
+'
+
 curl --fail --silent --show-error --cookie-jar "$COOKIE_FILE" "$SITE_URL/wp-login.php" >/dev/null
 curl --fail --silent --show-error --location \
 	--cookie "$COOKIE_FILE" \
