@@ -88,7 +88,10 @@ export function FontsTab() {
 		if (!font.family) return;
 
 		try {
-			const files = await fetchGoogleFontFiles(font.family, selectedVariants);
+			const files =
+				font.category === "custom-font"
+					? font.files
+					: await fetchGoogleFontFiles(font.family, selectedVariants);
 			const resolvedFont = { ...font, files };
 			const id = `${font.title}-${font.family}-${selectedVariants.join(".")}`;
 			const variants = font.variants.reduce((acc: FontVariantData[], v: FontVariantData) => {
@@ -107,8 +110,12 @@ export function FontsTab() {
 			setActiveTab(USER_FONTS);
 			toast.success("Font added successfully");
 		} catch (error) {
-			console.error("Failed to download Google Font:", error);
-			toast.error("Could not download the selected Google Font");
+			console.error("Failed to import font:", error);
+			toast.error(
+				font.category === "custom-font"
+					? "Could not upload the selected custom font"
+					: "Could not download the selected Google Font",
+			);
 		}
 	};
 

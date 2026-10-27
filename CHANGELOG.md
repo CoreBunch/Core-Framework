@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed importing a local font into WordPress failing with a Google Font download error. Custom fonts now upload the selected file directly instead of trying to find it on Google Fonts.
 - Fixed Bricks sites hanging when removed Core Framework classes were cleaned up. The initial lookup joined post metadata five times, multiplying rows on sites with many metadata entries. It now checks all five Bricks metadata keys through one join while retaining the existing batched cleanup.
 - Fixed transparent variants and shade/tint counts for RAW colors that reference another variable, such as `var(--bg-body)`. Generated variants now follow the current source color, while manually edited swatches are preserved. Older saved swatches without edit history are left unchanged on load; use Reset on a stale swatch to return it to automatic generation, then save to update the site's CSS.
 - Fixed the block editor going blank with the Core Framework Gutenberg integration enabled. The editor script was loaded with an outdated, hard-coded dependency list that left out WordPress's `react-jsx-runtime`, so rendering the Core Framework class panel threw on an undefined `ReactJSXRuntime` and took the whole editor down. The script now loads the dependencies its build declares.
