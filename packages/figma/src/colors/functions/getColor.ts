@@ -24,7 +24,7 @@ export const getColor = (value: string, colorVariables?: ColorVariable[], isDark
 
 		if (variable) {
 			visited.add(varName);
-			return variable.colorValue;
+			return isDarkColor ? variable.colorDarkValue || variable.colorValue : variable.colorValue;
 		}
 	}
 
