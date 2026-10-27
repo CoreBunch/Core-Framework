@@ -11,13 +11,12 @@ export function getTransparentVariable(
 	includeRawValue: boolean = false,
 	darkMode: boolean = false,
 	includeVariants: boolean = false,
+	colorVariables: ColorVariable[] = [],
 ) {
 	const { format } = color;
-	const colorValue = darkMode
-		? getColor(color.darkValue as string, [], true, true)
-		: getColor(color.value, [], true);
+	const colorValue = getColor(darkMode ? color.darkValue ?? "" : color.value, colorVariables, darkMode);
 
-	if (!colorValue || !isValidColorValue(colorValue)) return null;
+	if (!colord(colorValue).isValid()) return null;
 
 	const name = `${color.name}-${String(variant).replace("0.", "")}`;
 	const instance = colord(colorValue).alpha(Number(variant) / 100);
@@ -60,7 +59,7 @@ function createDeclarations(
 
 		for (const color of colors) {
 			const colorValue = darkMode ? color.darkValue : color.value;
-			if (!colorValue || !isValidColorValue(getColor(colorValue, vars))) continue;
+			if (!colorValue || !isValidColorValue(getColor(colorValue, vars, darkMode))) continue;
 
 			const processedColor = darkMode ? { ...color, value: color.darkValue ?? "" } : color;
 			colorsToProcess.push({
@@ -70,7 +69,7 @@ function createDeclarations(
 
 			if (color?.transparent && color?.transparentVariables?.length) {
 				color.transparentVariables.forEach((variant) => {
-					const variable = getTransparentVariable(color, variant, false, darkMode, includeVariants);
+					const variable = getTransparentVariable(color, variant, false, darkMode, includeVariants, vars);
 					if (variable) colorsToProcess.push({ ...variable, ...(includeVariants ? { groupName } : {}) });
 				});
 			}

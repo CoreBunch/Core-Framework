@@ -7,6 +7,7 @@ import { ulid } from "ulid";
 import { compareVersion, withDevTimeLogger } from "utils";
 import { DEFAULT_SHADES_COUNT } from "components/modules/colorSystem";
 import { generateShades, generateTints } from "components/modules/colorSystem/functions/generateShadesTints";
+import { refreshColorSystemReferences } from "@core-framework/core/components/modules/colorSystem/functions/refreshColorReferences";
 import {
 	COLUMN_LAYOUTS_GROUP_NAME,
 	COLUMN_VARIABLES_GROUP_NAME,
@@ -64,6 +65,12 @@ function addNewGroups({ preset, since, where, placeAsLast, groups }: addNewGroup
 }
 
 export function prepareColorSystem(preset: Preset): Preset {
+	const currentColors = preset.modulesData?.COLOR_SYSTEM;
+	if (currentColors) {
+		const refreshed = refreshColorSystemReferences(currentColors);
+		if (refreshed !== currentColors)
+			preset = { ...preset, modulesData: { ...preset.modulesData, COLOR_SYSTEM: refreshed } };
+	}
 	const { modulesData, app_version } = preset;
 
 	if (
@@ -99,6 +106,11 @@ export function prepareColorSystem(preset: Preset): Preset {
 
 		const newColors = colors
 			.map((color) => {
+				// A zero counter does not prove that saved blocks were never edited.
+				if (!color.shadesNumber && color.shades?.length)
+					color = { ...color, shadesNumber: color.shades.length };
+				if (!color.tintsNumber && color.tints?.length)
+					color = { ...color, tintsNumber: color.tints.length };
 				if (!color?.shadesNumber && color?.isShades) {
 					const shades = generateShades({
 						midColor: color.value,

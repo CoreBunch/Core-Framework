@@ -20,7 +20,7 @@ import {
 } from "./utils/frameMessaging";
 
 // Sync variables to Figma - must be outside component to avoid stale closures
-function syncVariables(presetData: Preset, colorVariables: ColorVariable[]) {
+function syncVariables(presetData: Preset, colorVariables: ColorVariable[], localSaveRequestId?: string) {
 	if (!presetData || !colorVariables) {
 		console.error("No preset or color variables");
 		return;
@@ -109,7 +109,16 @@ function syncVariables(presetData: Preset, colorVariables: ColorVariable[]) {
 		);
 	});
 
-	postMessageToParent({ type: "add-variables", variables });
+	postMessageToParent(
+		localSaveRequestId
+			? {
+					type: "save-project-locally",
+					requestId: localSaveRequestId,
+					payload: { preset: presetData },
+					variables,
+				}
+			: { type: "add-variables", variables },
+	);
 }
 
 function App() {
@@ -158,6 +167,9 @@ function App() {
 			if (pluginMessage?.type === "wordpress-response") {
 				postMessageToIframe("cf-figma-wordpress-response", pluginMessage);
 			}
+			if (pluginMessage?.type === "save-project-locally-response") {
+				postMessageToIframe("cf-figma-local-save-response", pluginMessage);
+			}
 
 			if (pluginMessage?.type === "import-project") {
 				const importedPreset = pluginMessage?.preset as Preset | undefined;
@@ -192,9 +204,18 @@ function App() {
 
 			if (event.data.type === "cf-push-local") {
 				const payload = event.data.payload;
-				parent.postMessage({ pluginMessage: { type: "save-project-locally", payload } }, "*");
-				if (payload?.preset && payload?.colorVariables) {
-					syncVariables(payload.preset, payload.colorVariables);
+				try {
+					if (!payload?.preset || !payload?.colorVariables || !event.data.requestId) {
+						throw new Error("No local project to save");
+					}
+					syncVariables(payload.preset, payload.colorVariables, event.data.requestId);
+					setPreset(payload.preset);
+				} catch (error) {
+					postMessageToIframe("cf-figma-local-save-response", {
+						requestId: event.data.requestId,
+						success: false,
+						error: error instanceof Error ? error.message : "Failed to prepare Figma variables",
+					});
 				}
 			}
 		};

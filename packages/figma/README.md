@@ -41,6 +41,8 @@ Fork maintainers who publish their own Community listing must create their own p
 
 You can create and save a project locally without any network connection. To synchronize with WordPress, create a connection key in **Core Framework → Figma** on the WordPress site and enter it in the Figma plugin. This key authenticates requests to that WordPress site; it is not a product license. Treat it as a secret and revoke it from WordPress when it is no longer needed.
 
+Local projects are saved in the current Figma file. After reopening the plugin in that file, choose **Use local project** to continue editing. A successful local save confirms both project storage and variable synchronization. Large projects are split into storage entries below Figma's size limit; existing projects saved by earlier versions remain readable. Synchronization updates the **Core Framework** variable collection and leaves other collections alone.
+
 The plugin connects directly to the WordPress origin encoded in that key; project data is not routed through Core Framework servers. The bundled Google Fonts catalog is local. Google is contacted only when a user selects, previews, or imports a Google-hosted font. See Google's [Terms of Service](https://policies.google.com/terms) and [Privacy Policy](https://policies.google.com/privacy).
 
 The plugin no longer supports the legacy hosted web-project IDs or `cfweb:` synchronization keys. Export those projects as `.core` files and import them locally instead.

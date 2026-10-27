@@ -1,7 +1,8 @@
-import { ChangeEvent, memo, useCallback, useMemo, useState } from "react";
+import { ChangeEvent, memo, useCallback, useMemo } from "react";
 import { Info } from "assets/icons/Info.icon";
 import { NumberInput } from "components/basic/NumberInput";
 import { Tooltip } from "components/ui/Tooltip";
+import { useGetColor } from "hooks/useGetColor";
 import { getColorOnIndex } from "../functions/getColorOnIndex";
 import { ColorFormatValue, ColorItem, DEFAULT_SHADES_COUNT, DEFAULT_TINTS_COUNT, Shade } from "../index";
 import { Collapse, Switch } from "@mantine/core";
@@ -12,12 +13,12 @@ const getInitialVariation = (color: ColorItem, variant: Variant): VariantValues 
 	if (variant === "shade") {
 		return {
 			isActive: color.isShades ?? false,
-			number: color.shadesNumber || DEFAULT_SHADES_COUNT,
+			number: color.shadesNumber || color.shades?.length || DEFAULT_SHADES_COUNT,
 		};
 	} else {
 		return {
 			isActive: color.isTints ?? false,
-			number: color.tintsNumber || DEFAULT_TINTS_COUNT,
+			number: color.tintsNumber || color.tints?.length || DEFAULT_TINTS_COUNT,
 		};
 	}
 };
@@ -33,12 +34,13 @@ interface ColorAdditionalVariations {
 	color: ColorItem;
 	variant: Variant;
 	onChange: (value: VariantValues) => void;
-	onUpdateColor: (value: string, index: number, isDark: boolean) => void;
+	onUpdateColor: (value: string, index: number, isDark: boolean, reset?: boolean) => void;
 }
 
 export const ColorAdditionalVariations = memo<ColorAdditionalVariations>(
 	({ color, variant, onChange, onUpdateColor }) => {
-		const [variation, setVariation] = useState(() => getInitialVariation(color, variant));
+		const variation = getInitialVariation(color, variant);
+		const { colorVariables } = useGetColor();
 
 		const items = useMemo(() => (variant === "shade" ? color.shades : color.tints), [color, variant]);
 		const darkItems = useMemo(() => (variant === "shade" ? color.darkShades : color.darkTints), [color, variant]);
@@ -46,7 +48,6 @@ export const ColorAdditionalVariations = memo<ColorAdditionalVariations>(
 		const handleSwitchChange = useCallback(
 			({ target: { checked } }: ChangeEvent<HTMLInputElement>) => {
 				onChange({ ...variation, isActive: checked });
-				setVariation((prev) => ({ ...prev, isActive: checked }));
 			},
 			[onChange, variation],
 		);
@@ -54,7 +55,6 @@ export const ColorAdditionalVariations = memo<ColorAdditionalVariations>(
 		const handleNumberChange = useCallback(
 			(value: number | string) => {
 				onChange({ ...variation, number: Number(value) });
-				setVariation((prev) => ({ ...prev, number: Number(value) }));
 			},
 			[onChange, variation],
 		);
@@ -72,7 +72,7 @@ export const ColorAdditionalVariations = memo<ColorAdditionalVariations>(
 						<label htmlFor="shades">
 							<h5
 								className="pointer"
-								onClick={() => setVariation((prev) => ({ ...prev, isActive: !variation.isActive }))}
+								onClick={() => onChange({ ...variation, isActive: !variation.isActive })}
 							>
 								{label}
 							</h5>
@@ -106,7 +106,7 @@ export const ColorAdditionalVariations = memo<ColorAdditionalVariations>(
 					<Collapse in={Boolean(variation.isActive)}>
 						<div className="row">
 							{items?.map(({ value, name }, index) => {
-								const defaultValue = getColorOnIndex({ state: color, index, type: variant });
+								const defaultValue = getColorOnIndex({ state: color, index, type: variant, colorVariables });
 								return (
 									<ColorVariationPreview
 										key={name}
@@ -115,7 +115,7 @@ export const ColorAdditionalVariations = memo<ColorAdditionalVariations>(
 										format={color.format as ColorFormatValue}
 										defaultValue={defaultValue}
 										onChangeEnd={(value) => onUpdateColor(value, index, false)}
-										onReset={() => onUpdateColor(defaultValue, index, false)}
+										onReset={() => onUpdateColor(defaultValue, index, false, true)}
 									/>
 								);
 							})}
@@ -124,7 +124,13 @@ export const ColorAdditionalVariations = memo<ColorAdditionalVariations>(
 						{color.isDarkMode && (
 							<div className="row margin-top-m">
 								{darkItems?.map(({ value, name }, index) => {
-									const defaultValue = getColorOnIndex({ state: color, index, type: variant });
+									const defaultValue = getColorOnIndex({
+										state: color,
+										index,
+										type: variant,
+										dark: true,
+										colorVariables,
+									});
 									return (
 										<ColorVariationPreview
 											key={name}
@@ -133,7 +139,7 @@ export const ColorAdditionalVariations = memo<ColorAdditionalVariations>(
 											format={color.format as ColorFormatValue}
 											defaultValue={defaultValue}
 											onChangeEnd={(value) => onUpdateColor(value, index, true)}
-											onReset={() => onUpdateColor(defaultValue, index, true)}
+											onReset={() => onUpdateColor(defaultValue, index, true, true)}
 										/>
 									);
 								})}

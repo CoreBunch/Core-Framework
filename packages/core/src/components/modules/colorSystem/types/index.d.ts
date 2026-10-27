@@ -97,6 +97,10 @@ export type FormAction =
 
 export type SingleColorReducerAction =
 	| {
+			type: "refreshReferences";
+			payload: { previousVariables: ColorVariable[]; colorVariables: ColorVariable[] };
+	  }
+	| {
 			type: "restore";
 			payload: ColorItem;
 	  }
@@ -131,6 +135,8 @@ export type SingleColorReducerAction =
 export type Shade = {
 	name: string;
 	value: string;
+	/** Undefined in legacy presets, which did not record manual edits. */
+	isCustom?: boolean;
 };
 
 export type ColorFormatValue = ColorFormat | "raw";
@@ -141,7 +147,3 @@ export type ColorVariable = {
 	transparent?: number;
 	colorDarkValue?: string;
 };
-
-export interface UpdatedWindow {
-	colorVariables: ColorVariable[];
-}

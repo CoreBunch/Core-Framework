@@ -27,6 +27,7 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 	const [error, setError] = useState<string | null>(null);
 
 	const [localPreset, setLocalPreset] = useState<Preset | null>(null);
+	const [localError, setLocalError] = useState<string | null>(null);
 	const [showConfirmation, setShowConfirmation] = useState(false);
 
 	const onImport = (apiKey: string) => {
@@ -141,7 +142,7 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 	};
 
 	const loadOnboarding = () => {
-		if (localPreset?.id) {
+		if (localPreset?.id || localError) {
 			setShowConfirmation(true);
 		} else {
 			startNewProject();
@@ -214,6 +215,7 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 				}
 				case "get-project-locally": {
 					const preset = pluginMessage.preset;
+					setLocalError(pluginMessage.error || null);
 					if (preset) {
 						setLocalPreset(preset);
 					}
@@ -276,9 +278,14 @@ export const SelectProjectSection = memo<SelectProjectSection>(({ handleLoadedPr
 					title="Start a new project"
 					content={
 						<>
+							{localError && <p className="error">{localError}</p>}
 							{showConfirmation ? (
 								<div className="confirmation-inline">
-									<p>You have a local project. What would you like to do?</p>
+									<p>
+										{localError
+											? "Starting from scratch will replace the saved local project."
+											: "You have a local project. What would you like to do?"}
+									</p>
 									<div className="confirmation-buttons">
 										<button className="btn-primary" onClick={startNewProject}>
 											Start from scratch

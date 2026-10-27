@@ -55,6 +55,14 @@ export const ColorSingleRow = memo<ColorSingleRow>(
 
 		const [copy, setCopy] = useReducer(singleColorReducer, color);
 		const debouncedCopy = useDebounce(copy, 500);
+		const previousVariables = useRef(colorVariables);
+		useEffect(() => {
+			setCopy({
+				type: "refreshReferences",
+				payload: { previousVariables: previousVariables.current, colorVariables },
+			});
+			previousVariables.current = colorVariables;
+		}, [colorVariables]);
 
 		const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
 			id: color.id,

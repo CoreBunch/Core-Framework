@@ -23,6 +23,7 @@ const AVAILABLE_FORMATS = [
 const shadeOrTintSchema = z.object({
 	name: z.string(),
 	value: z.string(),
+	isCustom: z.boolean().optional(),
 });
 
 export const colorItemSchema = z.object({

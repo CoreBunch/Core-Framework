@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { ColorVariable } from "../components/modules/colorSystem";
 import { colorGroupsToVariables } from "../components/modules/colorSystem/functions/colorGroupsToVariables";
 import cssColorNames from "../data/cssColorNames";
@@ -7,7 +7,7 @@ import { ColorFormat } from "@mantine/core/lib/ColorPicker/types";
 import type { Color } from "@adobe/react-spectrum";
 import { parseColor } from "@adobe/react-spectrum";
 import { colord } from "colord";
-import { useAtomCallback } from "jotai/utils";
+import { useAtomValue } from "jotai";
 import { colorSystemFormDataAtom } from "../state";
 
 const errors = {
@@ -16,11 +16,8 @@ const errors = {
 };
 
 export function useGetColor() {
-	const getColorSystemFormDataAtom = useAtomCallback(useCallback((get) => get(colorSystemFormDataAtom), []));
-	const colorVariables = useMemo(
-		() => colorGroupsToVariables(getColorSystemFormDataAtom()),
-		[getColorSystemFormDataAtom],
-	) as ColorVariable[];
+	const colorSystem = useAtomValue(colorSystemFormDataAtom);
+	const colorVariables = useMemo(() => colorGroupsToVariables(colorSystem), [colorSystem]) as ColorVariable[];
 
 	const errorMsg = useRef("");
 	const variableRegex = /^var\(--(.*?)\)$/;
@@ -40,7 +37,7 @@ export function useGetColor() {
 
 		if (variable) {
 			visited.add(varName);
-			const color = isDark ? variable.colorDarkValue || "" : variable.colorValue;
+			const color = isDark ? variable.colorDarkValue || variable.colorValue : variable.colorValue;
 			return getColor(color, isDark, visited);
 		}
 		return cssColorNames[value] ?? value;
@@ -68,7 +65,7 @@ export function useGetColor() {
 
 		if (variable) {
 			visited.add(varName);
-			const color = isDark ? variable.colorDarkValue || "" : variable.colorValue;
+			const color = isDark ? variable.colorDarkValue || variable.colorValue : variable.colorValue;
 			return checkInfinite(color, isDark, visited);
 		}
 

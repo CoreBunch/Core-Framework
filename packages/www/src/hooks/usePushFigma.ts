@@ -1,4 +1,5 @@
 import { WpApiProxyProps, syncCSSWithFigma, updatePresetWithFigma } from "functions/wpdb-proxy";
+import { saveFigmaProject } from "functions/saveFigmaProject";
 import { useAtomValue } from "jotai";
 import { toast } from "sonner";
 import { ColorVariable } from "components/modules/colorSystem/types";
@@ -23,42 +24,14 @@ export function usePushFigma() {
 	}
 
 	const syncWp = async (props: HandleFigmaPushProps) => {
-		const { url } = extractApiKey(figma.apiKey);
+		// The save button spins until setIsLoading(false), so every exit must reach
+		// the finally, and every failure must say so rather than end in silence.
+		try {
+			const { url } = extractApiKey(figma.apiKey);
 
-		window.parent.postMessage(
-			{
-				type: "cf-push",
-				payload: {
-					preset: props.newPresetData,
-					colorVariables: props.colorVariables,
-				},
-			},
-			"*",
-		);
-
-		const wpApiProxyProps: WpApiProxyProps = {
-			apiKey: figma.apiKey,
-			url,
-		};
-
-		const [cssResponse, presetResponse] = await Promise.all([
-			syncCSSWithFigma({ cssString: props.cssString, ...wpApiProxyProps }),
-			updatePresetWithFigma({ newPresetData: props.newPresetData, ...wpApiProxyProps }),
-		]);
-
-		if (cssResponse && presetResponse) {
-			await handleFigmaPushSync({ preset: props.newPresetData, ...wpApiProxyProps });
-			toast.success("Synced successfully");
-		}
-
-		props.setIsLoading(false);
-	};
-
-	const handleFigmaPush = async (props: HandleFigmaPushProps) => {
-		if (!figma.apiKey) {
 			window.parent.postMessage(
 				{
-					type: "cf-push-local",
+					type: "cf-push",
 					payload: {
 						preset: props.newPresetData,
 						colorVariables: props.colorVariables,
@@ -66,10 +39,42 @@ export function usePushFigma() {
 				},
 				"*",
 			);
-			await new Promise((resolve) => setTimeout(resolve, 200));
-			props.setIsLoading(false);
-			console.log("Synced successfully");
+
+			const wpApiProxyProps: WpApiProxyProps = {
+				apiKey: figma.apiKey,
+				url,
+			};
+
+			const [cssResponse, presetResponse] = await Promise.all([
+				syncCSSWithFigma({ cssString: props.cssString, ...wpApiProxyProps }),
+				updatePresetWithFigma({ newPresetData: props.newPresetData, ...wpApiProxyProps }),
+			]);
+
+			if (!(cssResponse && presetResponse)) {
+				toast.error("Failed to save to WordPress. Your changes were not applied.");
+				return;
+			}
+
+			await handleFigmaPushSync({ preset: props.newPresetData, ...wpApiProxyProps });
 			toast.success("Synced successfully");
+		} catch (error) {
+			console.error(error);
+			toast.error("Failed to sync with WordPress.");
+		} finally {
+			props.setIsLoading(false);
+		}
+	};
+
+	const handleFigmaPush = async (props: HandleFigmaPushProps) => {
+		if (!figma.apiKey) {
+			try {
+				await saveFigmaProject({ preset: props.newPresetData, colorVariables: props.colorVariables });
+				toast.success("Synced successfully");
+			} catch (error) {
+				toast.error(error instanceof Error ? error.message : "Failed to save the local Figma project.");
+			} finally {
+				props.setIsLoading(false);
+			}
 			return;
 		}
 

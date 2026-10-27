@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { getPluginMessage } from "../src/utils/frameMessaging";
+import { getPluginMessage, isMessageFromEditor, postMessageToIframe } from "../src/utils/frameMessaging";
 
 describe("getPluginMessage", () => {
 	test("accepts Figma host messages when event.source is null", () => {
@@ -26,4 +26,26 @@ describe("getPluginMessage", () => {
 		expect(getPluginMessage({ data: { type: "cf-figma-ready" } } as MessageEvent)).toBeNull();
 		expect(getPluginMessage({ data: { pluginMessage: "invalid" } } as MessageEvent)).toBeNull();
 	});
+});
+
+test("keeps response routing types when forwarding host payloads (#30)", () => {
+	const originalDocument = globalThis.document;
+	const messages: unknown[] = [];
+	const contentWindow = { postMessage: (message: unknown) => messages.push(message) };
+	globalThis.document = { getElementById: () => ({ contentWindow }) } as unknown as Document;
+	try {
+		for (const [hostType, editorType] of [
+			["wordpress-response", "cf-figma-wordpress-response"],
+			["save-project-locally-response", "cf-figma-local-save-response"],
+		]) {
+			const payload = { type: hostType, requestId: "reply", success: true };
+			const message = getPluginMessage({ data: { pluginMessage: payload }, source: null } as MessageEvent)!;
+			postMessageToIframe(editorType, message);
+			expect(messages.at(-1)).toEqual({ ...payload, type: editorType });
+		}
+		expect(isMessageFromEditor({ source: contentWindow } as unknown as MessageEvent)).toBe(true);
+		expect(isMessageFromEditor({ source: null } as MessageEvent)).toBe(false);
+	} finally {
+		globalThis.document = originalDocument;
+	}
 });

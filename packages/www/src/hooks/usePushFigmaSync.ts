@@ -1,4 +1,6 @@
 import { useCallback } from "react";
+import { colorGroupsToVariables } from "components/modules/colorSystem/functions/colorGroupsToVariables";
+import type { ColorVariable } from "components/modules/colorSystem";
 import { getClassNamesGroupedByGroups } from "functions/getClassNamesGroupedByGroups";
 import { minifyCss } from "functions/minifyCss";
 import {
@@ -112,6 +114,7 @@ export function usePushFigmaSync() {
 			return;
 		}
 
+		const colorVariables = colorGroupsToVariables(colorSystemFormData) as ColorVariable[];
 		const colors = [];
 
 		for (const group of colorSystemFormData.groups) {
@@ -148,7 +151,7 @@ export function usePushFigmaSync() {
 								name = "",
 								value = "",
 								id = "",
-							} = getTransparentVariable(colorItem, variant, true) || {};
+							} = getTransparentVariable(colorItem, variant, true, false, false, colorVariables) || {};
 
 							if (!id) return;
 
@@ -255,7 +258,14 @@ export function usePushFigmaSync() {
 
 					if (transparent && transparentVariables && transparentVariables.length) {
 						transparentVariables.forEach((variant) => {
-							const transparentColor = getTransparentVariable(colorItem, variant, false, true);
+							const transparentColor = getTransparentVariable(
+								colorItem,
+								variant,
+								false,
+								true,
+								false,
+								colorVariables,
+							);
 							if (!transparentColor) {
 								return;
 							}
@@ -397,8 +407,13 @@ export function usePushFigmaSync() {
 		const preferences = getPresetPreferences();
 
 		await Promise.allSettled([
-			handleClassesRefresh({ cssObjects, preset, ...wpApiProxyProps }),
-			handleColorsRefresh({ preset, ...wpApiProxyProps }),
+			handleClassesRefresh({ cssObjects, classPrefix: preset.classPrefix, preset, ...wpApiProxyProps }),
+			handleColorsRefresh({
+				classPrefix: preset.classPrefix,
+				variablePrefix: preset.variablePrefix,
+				preset,
+				...wpApiProxyProps,
+			}),
 			handleCssGeneratorPrefixed({
 				cssObjects,
 				classPrefix: preset.classPrefix,
