@@ -17,6 +17,7 @@ import { useEffectOnce } from "hooks/useEffectOnce";
 import { isFullScreenModeAtom } from "./state/fullscreenAtoms";
 import { searchAtom } from "./state/searchAtom";
 import { currentPresetAtom, getPresetFromCurrentPresetAtom, setCurrentPresetAtom } from "state";
+import { embedViewOnlyAtom } from "state/embedAtom";
 import { figmaAtom } from "state/figmaAtom";
 import { onboardingAtom, onboardingNameAtom } from "state/onboardingAtom";
 import { lastSavedStateAtom } from "state/saveAtom";
@@ -44,16 +45,14 @@ export function App() {
 	const { handleLoadOfAutocomplete } = useAutoCompleteLoad();
 
 	const setFigma = useSetAtom(figmaAtom);
+	const setEmbedViewOnly = useSetAtom(embedViewOnlyAtom);
 
 	function onEmbedLoadPreset(event: MessageEvent) {
 		try {
 			const currentFramework = event?.data?.preset;
 			const isViewOnly = event?.data?.isViewOnly;
 
-			if (isViewOnly) {
-				document.getElementById("push1")?.remove();
-				document.getElementById("push2")?.remove();
-			}
+			setEmbedViewOnly(isViewOnly === true);
 
 			if (currentFramework) {
 				const parsed = JSON.parse(currentFramework);
