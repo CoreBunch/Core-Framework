@@ -32,7 +32,12 @@ export function getColorVariables({ preset, colorVariables }: GetColorVariablesP
 		for (const color of group.colors) {
 			const isValidColor = isValidColorValue(color.value);
 			const colorValue = isValidColor ? color.value : getColor(color.value, colorVariables);
-			const darkColorValue = isValidColor ? color.darkValue : getColor(color.darkValue, colorVariables);
+			const darkColorValue =
+				color.isDarkMode && color.darkValue
+					? isValidColorValue(color.darkValue)
+						? color.darkValue
+						: getColor(color.darkValue, colorVariables, true)
+					: undefined;
 
 			variables.push({
 				variable: `Colors/${group.name}/${variablePrefix}${color.name}`,
