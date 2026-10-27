@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { skipWhenViewOnly, waitForEmbedPushResponse } from "functions/embedBridge";
 import { isEmbed } from "functions/isEmbed";
 import { isFigma } from "functions/isFigma";
 import { minifyCss } from "functions/minifyCss";
@@ -20,6 +21,7 @@ import {
 	presetPreferencesSelector,
 	stylesheetsDataAtom,
 } from "state";
+import { embedViewOnlyAtom } from "state/embedAtom";
 import { hasUnsavedChangesAtom, isHandleSave, lastSavedStateAtom } from "state/saveAtom";
 import { usePushFigma } from "./usePushFigma";
 
@@ -86,6 +88,7 @@ export function usePush() {
 	const getPreferences = useAtomCallback(useCallback((get) => get(presetPreferencesSelector), []));
 	const getColorSystemFormDataAtom = useAtomCallback(useCallback((get) => get(colorSystemFormDataAtom), []));
 	const getStylesheetsData = useAtomCallback(useCallback((get) => get(stylesheetsDataAtom), []));
+	const getIsViewOnly = useAtomCallback(useCallback((get) => get(embedViewOnlyAtom), []));
 
 	interface IHandleCssGenerator {
 		readonly cssObjects: CssObject[];
@@ -269,41 +272,16 @@ export function usePush() {
 		setHasUnsavedChanges(false);
 		setIsHandleSave(false);
 
-		let isReceived = false;
-
 		if (isEmbed() && !isFigma()) {
-			window.addEventListener(
-				"message",
-				(event) => {
-					if (event.data.type !== "cf-push-response") {
-						setIsLoading(false);
-						return;
-					}
-
-					if (isReceived) {
-						setIsLoading(false);
-						return;
-					}
-
-					isReceived = true;
-
-					if (event.data?.success) {
-						setIsLoading(false);
-						toast.success("Saved successfully");
-
-						window.removeEventListener("message", () => {});
-						return;
-					}
-
+			waitForEmbedPushResponse().then((isSaved) => {
+				if (isSaved) {
+					toast.success("Saved successfully");
+				} else {
 					toast.error("Something went wrong");
-					setIsLoading(false);
+				}
 
-					window.removeEventListener("message", () => {});
-				},
-				{
-					once: true,
-				},
-			);
+				setIsLoading(false);
+			});
 		} else {
 			toast.success("Saved successfully");
 			setIsLoading(false);
@@ -321,7 +299,7 @@ export function usePush() {
 	}, [isLoading, handleFigmaPush, cssSize, getColorSystemFormDataAtom, getNewPreset, getPreferences, getSortedStyles, getStylesheetsData, handleCssGenerator, setHasUnsavedChanges, setIsHandleSave, setLastSavedState]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	return {
-		handlePush: useMemo(() => rateLimiter(handlePush), [handlePush]),
+		handlePush: useMemo(() => skipWhenViewOnly(getIsViewOnly, rateLimiter(handlePush)), [getIsViewOnly, handlePush]),
 		cssSize,
 		newPresetData,
 		cssString,

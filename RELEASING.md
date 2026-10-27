@@ -1,6 +1,6 @@
 # Releasing Core Framework
 
-Core Framework uses a tag-driven release process. A push to `main` never publishes a WordPress or Figma update.
+Core Framework uses a tag-driven release process for the WordPress and Figma plugins. A push to `main` never publishes a WordPress or Figma update. It does deploy the web app; see [Web app](#web-app).
 
 ## Release flow
 
@@ -43,6 +43,18 @@ The GitHub Release contains:
 
 - `core-framework-X.Y.Z.zip` for WordPress and WordPress.org deployment.
 - `core-framework-figma-X.Y.Z.zip` for a self-contained local Figma installation.
+
+## Web app
+
+The hosted editor at [coreframework.com/app](https://coreframework.com/app) is not versioned by tags. The website (a separate, private repository) embeds it in an iframe from `https://alpha.coreframework.com/`, and that domain is served by the Vercel project `core-framework` in the `core-bunch` team.
+
+- **Source:** the `CoreBunch/Core-Framework` repository, branch `main`.
+- **Root Directory:** `packages/www`. The build settings live in [`packages/www/vercel.json`](packages/www/vercel.json): install with `bun install --frozen-lockfile`, build with `bun run build` (`tsc && vite build`), and serve `dist`. Both commands run Bun 1.3.11 through `bunx`, the version in the root `packageManager` field; change the two together.
+- **Trigger:** every merge to `main` deploys to production. Pull requests get preview deployments. With the project's **Skip deployment** setting on, Vercel skips commits that change nothing `packages/www` depends on (it reads the `@core-framework/core` workspace dependency).
+
+The editor shows `APP_VERSION` from `main`, so between releases it runs merged, unreleased changes under the last released number. To check what is live, fetch the page, find the `assets/index-*.js` bundle it loads, and search that bundle for the version string.
+
+The website and the editor talk through `postMessage`. The website sends `cf-embed-load-preset`, `cf-embed-load-preset-default`, `cf-push-response` and `cf-read-clipboard`. The editor sends `cf-ready`, `cf-push`, `cf-copy-to-clipboard` and `cf-read-clipboard`. Renaming any of them breaks the hosted editor until the website changes too, and a merge to `main` ships the rename immediately.
 
 ## Figma Community publishing
 
