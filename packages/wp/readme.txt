@@ -4,7 +4,7 @@ Tags: css, framework, stylesheet, bricks, oxygen
 Requires at least: 6.6
 Requires PHP: 8.0
 Tested up to: 7.0
-Stable tag: 2.0.2
+Stable tag: 2.1.0
 License: MIT
 License URI: https://opensource.org/license/mit
 
@@ -74,6 +74,20 @@ No. Marketplace design kits and packs are optional content products and are not 
 No. The font browser uses Google's public, keyless font endpoints.
 
 == Changelog ==
+
+= 2.1.0 =
+
+* Requires WordPress 6.6 or newer. Sites on WordPress 6.0 to 6.5 should stay on Core Framework 2.0.2.
+* Fixed a blank block editor caused by missing script dependencies, and stopped opening posts or templates from marking them as modified.
+* Restored the dark and light preview toggle in Bricks 2.4 toolbars and fixed slow class cleanup on sites with many post metadata entries.
+* Fixed Figma saves to WordPress, including prefixed classes and variables, builder synchronization, stuck save indicators, and missing error messages.
+* Fixed local Figma projects disappearing after reopening the plugin, and RAW color synchronization when a referenced color has no dark-mode value.
+* Fixed RAW color variants that reference another variable. Manually edited swatches are preserved. For an older stale swatch, use Reset and save to regenerate its CSS.
+* Stopped disabled shades and tints from appearing in Bricks and Oxygen variable lists.
+* Fixed local font imports incorrectly trying to download from Google Fonts.
+* Fixed View Only mode and missing save confirmations in the hosted web editor.
+* Restored WordPress update notes and added a packaging check to keep future release notes available.
+* Fixed the WordPress minimum-version check so unsupported sites receive a clear notice.
 
 = 2.0.2 =
 

@@ -75,7 +75,7 @@
     },
     "packages/figma": {
       "name": "core-framework-figma",
-      "version": "2.0.2",
+      "version": "2.1.0",
       "dependencies": {
         "@fontsource-variable/inter": "^5.3.0",
         "colord": "^2.9.7",
@@ -102,7 +102,7 @@
     },
     "packages/gutenberg": {
       "name": "coreframework-gutenberg-integration",
-      "version": "2.0.2",
+      "version": "2.1.0",
       "devDependencies": {
         "@wordpress/block-editor": "^16.1.0",
         "@wordpress/browserslist-config": "^6.53.0",
@@ -119,7 +119,7 @@
     },
     "packages/wp": {
       "name": "coreframework",
-      "version": "2.0.2",
+      "version": "2.1.0",
       "dependencies": {
         "@adobe/react-spectrum": "^3.47.3",
         "@core-framework/core": "workspace:*",
@@ -167,7 +167,7 @@
     },
     "packages/www": {
       "name": "core-framework",
-      "version": "2.0.2",
+      "version": "2.1.0",
       "dependencies": {
         "@adobe/react-spectrum": "^3.47.3",
         "@core-framework/core": "workspace:*",

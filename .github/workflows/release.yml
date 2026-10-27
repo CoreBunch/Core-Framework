@@ -52,6 +52,9 @@ jobs:
         working-directory: packages/www
         run: bunx jest --coverage --detectOpenHandles --watchman=false
 
+      - name: Test Figma plugin
+        run: bun run --filter './packages/figma' test
+
       - name: Test WordPress PHP
         working-directory: packages/wp
         run: vendor/bin/phpunit Tests
