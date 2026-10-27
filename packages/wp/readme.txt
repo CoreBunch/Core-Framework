@@ -75,6 +75,14 @@ No. The font browser uses Google's public, keyless font endpoints.
 
 == Changelog ==
 
+= 2.0.2 =
+
+* Fixed saving from Figma Desktop when its sandbox blocks local storage.
+* Fixed Figma connections to WordPress sites using Plain permalinks, and added clearer connection errors.
+* Fixed Oxygen Classic hanging on load when a project contains custom fonts.
+* Stopped disabled fonts from appearing in the Oxygen and Bricks builders.
+* Fixed local fonts with spaces in their family names failing to load. Re-save an affected font after updating to regenerate its CSS.
+
 = 2.0.1 =
 
 * Fixed the Auto BEM class generator not appearing in the Bricks structure panel after updating to 2.0.0.
