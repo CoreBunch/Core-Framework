@@ -1,4 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
+import { colorGroupsToVariables } from "components/modules/colorSystem/functions/colorGroupsToVariables";
+import type { ColorVariable } from "components/modules/colorSystem";
 import { devLog } from "functions/devLog";
 import { getClassNamesGroupedByGroups } from "functions/getClassNamesGroupedByGroups";
 import { minifyCss } from "functions/minifyCss";
@@ -202,6 +204,7 @@ export function usePush() {
 			return;
 		}
 
+		const colorVariables = colorGroupsToVariables(colorSystemFormData) as ColorVariable[];
 		const colors = [];
 
 		for (const group of colorSystemFormData.groups) {
@@ -240,7 +243,7 @@ export function usePush() {
 								name = "",
 								value = "",
 								id = "",
-							} = getTransparentVariable(colorItem, variant, true) || {};
+							} = getTransparentVariable(colorItem, variant, true, false, false, colorVariables) || {};
 
 							if (!id) return;
 
@@ -347,7 +350,14 @@ export function usePush() {
 
 					if (transparent && transparentVariables && transparentVariables.length) {
 						transparentVariables.forEach((variant) => {
-							const transparentColor = getTransparentVariable(colorItem, variant, false, true);
+							const transparentColor = getTransparentVariable(
+								colorItem,
+								variant,
+								false,
+								true,
+								false,
+								colorVariables,
+							);
 							if (!transparentColor) {
 								return;
 							}

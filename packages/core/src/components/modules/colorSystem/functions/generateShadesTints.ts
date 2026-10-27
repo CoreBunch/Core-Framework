@@ -1,5 +1,6 @@
 import { DEFAULT_SHADES_COUNT } from "../data/defaults";
-import { ColorItem, Shade } from "../types";
+import { ColorItem, ColorVariable, Shade } from "../types";
+import { getColor } from "./getColor";
 import { ColorFormat } from "@mantine/core/lib/ColorPicker/types";
 import chroma from "chroma-js";
 import { colord, getFormat } from "colord";
@@ -65,36 +66,62 @@ export function generateAdditionalColorName({ name, index, type }: IGenerateShad
 	return `${name}-${types[type]}-${index + 1}`;
 }
 
-export function generateWithCheck(state: ColorItem, newColor: string, type: ColorType, isDark = false) {
+export function generateWithCheck(
+	state: ColorItem,
+	newColor: string,
+	type: ColorType,
+	isDark = false,
+	colorVariables: ColorVariable[] = [],
+) {
 	const formatItem = (item: Shade) => ({
 		...item,
 		value: convertToDesiredColorFormat(item.value, state.format),
 	});
-	const generateItems = (color: string, count: number) =>
-		generateFn({ midColor: color, name: state.name, number: count, format: "hsla" }).map(formatItem);
+	const generateItems = (color: string, count: number): Shade[] =>
+		generateFn({ midColor: color, name: state.name, number: count, format: "hsla" }).map((item) => ({
+			...formatItem(item),
+			isCustom: false,
+		}));
 
 	const isShade = type === "shade";
 	const generateFn = isShade ? generateShades : generateTints;
 	const number = (isShade ? state.shadesNumber : state.tintsNumber) ?? 0;
-	const midColor = isDark ? state.darkValue ?? "" : state.value;
-	const existingItems = (
-		isDark ? (isShade ? state.darkShades : state.darkTints) : isShade ? state.shades : state.tints
-	)?.map(formatItem);
+	const midColor = getColor(isDark ? (state.darkValue ?? "") : state.value, colorVariables, isDark);
+	const savedItems = isDark
+		? isShade
+			? state.darkShades
+			: state.darkTints
+		: isShade
+			? state.shades
+			: state.tints;
+	const existingItems = savedItems?.map(formatItem);
 
 	let generatedItems =
 		number !== existingItems?.length
 			? generateItems(midColor, existingItems?.length ?? 0)
 			: generateItems(midColor, number);
-	const newGeneratedItems = generateItems(newColor, number);
+	const newGeneratedItems = generateItems(getColor(newColor, colorVariables, isDark), number);
+	// An unresolved reference must not erase custom or unclassified legacy values.
+	if (!newGeneratedItems.length && savedItems?.some((item) => item.isCustom !== false)) return savedItems;
 
-	for (let i = 0; i < generatedItems.length; i++) {
+	for (let i = 0; i < (existingItems?.length ?? 0); i++) {
 		const existingItem = existingItems?.[i];
 		const generatedItem = generatedItems[i];
 
 		if (existingItem && newGeneratedItems[i]) {
+			if (existingItem.isCustom === false) continue;
+			if (existingItem.isCustom === true || !generatedItem) {
+				newGeneratedItems[i] = savedItems![i];
+				continue;
+			}
 			const totalDiff = calculateTotalDifference(generatedItem.value, existingItem.value);
-			if (state.prevFormat !== state.format && totalDiff > PERCENTAGE_ERROR)
-				newGeneratedItems[i] = existingItem;
+			const isCustomRawColor =
+				state.format === "raw" && colord(generatedItem.value).toHex() !== colord(existingItem.value).toHex();
+			if (
+				isCustomRawColor ||
+				(state.format !== "raw" && state.prevFormat !== state.format && totalDiff > PERCENTAGE_ERROR)
+			)
+				newGeneratedItems[i] = savedItems![i];
 		}
 	}
 
@@ -111,7 +138,7 @@ function parseHSLA(hslaString: string) {
 				s: parseInt(result[2], 10),
 				l: parseInt(result[3], 10),
 				a: parseFloat(result[4]),
-		  }
+			}
 		: { h: 0, s: 0, l: 0, a: 0 };
 }
 
