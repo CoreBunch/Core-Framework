@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 
+- Fixed Oxygen 6 returning HTTP 500 when WordPress debugging is enabled. Builder detection now reads version metadata without loading translations before WordPress is ready.
+- Fixed the first dark-mode preview click doing nothing in Oxygen Classic and Oxygen 6 when the project defaults to Dark. The toolbar and canvas now stay in sync, including automatic themes and saved browser preferences.
+
 - Restored the missing 2.0.2 release notes in the WordPress plugin readme. Future WordPress packages now require a changelog entry for their version so update notes remain available in WordPress's plugin details.
 - Fixed importing a local font into WordPress failing with a Google Font download error. Custom fonts now upload the selected file directly instead of trying to find it on Google Fonts.
 - Fixed Figma synchronization stopping when a RAW color referenced another variable without a dark-mode value. Light and dark colors now resolve independently, so mixed literal and referenced colors keep their correct values.

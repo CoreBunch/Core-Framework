@@ -229,69 +229,35 @@ interface OxygenGlobalStore {
 
         const iframe = page.getElementById(CT_IFRAME_ID) as HTMLIFrameElement | null;
 
-        iframe?.addEventListener("load", () =>
-            setTimeout(() => {
-                const iframeHtml = iframe?.contentDocument?.querySelector("html");
-                const html = page.querySelector("html");
-                if (!iframeHtml) {
-                    log("Iframe html not found");
-                    return;
-                }
+        const updateTheme = (isDark: boolean) => {
+            const iframeHtml = iframe?.contentDocument?.documentElement;
+            if (!iframeHtml) return;
+            for (const html of [iframeHtml, page.documentElement]) {
+                html.classList.toggle(ThemeClasses.DARK, isDark);
+                html.classList.toggle(ThemeClasses.LIGHT, !isDark);
+            }
+            const lightIcon = toggleButton.querySelector(".cf-theme-icon--sun") as HTMLElement | null;
+            const darkIcon = toggleButton.querySelector(".cf-theme-icon--moon") as HTMLElement | null;
+            if (lightIcon) lightIcon.style.display = isDark ? "none" : "block";
+            if (darkIcon) darkIcon.style.display = isDark ? "block" : "none";
+            flipToggles(isDark ? "light" : "dark");
+        };
 
-                iframeHtml.classList.remove(...[ThemeClasses.DARK, ThemeClasses.LIGHT]);
-
-                const savedTheme = window?.localStorage?.getItem("cf-theme") as "dark" | "light" | "auto" | null;
-                const defaultTheme = String(themeMode === "auto" ? getSystemThemeClass() : `cf-theme-${themeMode}`);
-
-                iframeHtml.classList.add(savedTheme ? `cf-theme-${savedTheme}` : defaultTheme);
-                html?.classList.add(savedTheme ? `cf-theme-${savedTheme}` : defaultTheme);
-            }, 5),
-        );
+        const syncTheme = () => {
+            const selectedTheme = window.localStorage.getItem("cf-theme") ?? themeMode;
+            updateTheme(selectedTheme === "auto" ? getSystemThemeClass() === ThemeClasses.DARK : selectedTheme === "dark");
+        };
+        iframe?.addEventListener("load", () => setTimeout(syncTheme, 5));
+        syncTheme();
 
         toggleButton.addEventListener("click", () => {
-            const iframeDocument = (page.getElementById(CT_IFRAME_ID) as HTMLIFrameElement | null)
-                ?.contentDocument;
-
-            if (!iframeDocument) {
-                log("Iframe document not found");
-                return;
-            }
-
-            const iframeHtml = iframeDocument.querySelector("html");
-
-            if (!iframeHtml) {
-                log("Iframe html not found");
-                return;
-            }
-
-            const theme = window?.localStorage?.getItem("cf-theme") as "dark" | "light" | "auto" | null;
-            const isDefaultDark = theme === "dark";
-
-            if (isDefaultDark) {
-                iframeHtml.classList.remove(ThemeClasses.DARK);
-                iframeHtml.classList.add(ThemeClasses.LIGHT);
-            } else {
-                iframeHtml.classList.remove(ThemeClasses.LIGHT);
-                iframeHtml.classList.add(ThemeClasses.DARK);
-            }
-
-            const html = page.querySelector("html");
-            html?.classList.toggle(ThemeClasses.DARK);
-            html?.classList.toggle(ThemeClasses.LIGHT);
-
-            const sunIcon = toggleButton.querySelector(".cf-theme-icon--sun") as HTMLElement;
-            const moonIcon = toggleButton.querySelector(".cf-theme-icon--moon") as HTMLElement;
-
-            if (sunIcon) sunIcon.style.display = isDefaultDark ? "block" : "none";
-            if (moonIcon) moonIcon.style.display = isDefaultDark ? "none" : "block";
-
-            flipToggles(isDefaultDark ? "light" : "dark");
-            window?.localStorage?.setItem("cf-theme", !isDefaultDark ? "dark" : "light");
-
-            // Update color variable swatches when theme changes
-            if (typeof updateColorVariablesForTheme === "function") {
-                updateColorVariablesForTheme(!isDefaultDark);
-            }
+            const iframeHtml = iframe?.contentDocument?.documentElement;
+            if (!iframeHtml) return;
+            // The canvas already reflects default/system preferences even before storage exists.
+            const isDark = !iframeHtml.classList.contains(ThemeClasses.DARK);
+            updateTheme(isDark);
+            window.localStorage.setItem("cf-theme", isDark ? "dark" : "light");
+            updateColorVariablesForTheme(isDark);
         });
     };
 

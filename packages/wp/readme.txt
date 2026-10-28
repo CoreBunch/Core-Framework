@@ -77,6 +77,8 @@ No. The font browser uses Google's public, keyless font endpoints.
 
 = 2.1.0 =
 
+* Fixed Oxygen 6 failing to open with WordPress debugging enabled, and corrected dark-mode preview toggling and automatic themes in both Oxygen editors.
+
 * Requires WordPress 6.6 or newer. Sites on WordPress 6.0 to 6.5 should stay on Core Framework 2.0.2.
 * Fixed a blank block editor caused by missing script dependencies, and stopped opening posts or templates from marking them as modified.
 * Restored the dark and light preview toggle in Bricks 2.4 toolbars and fixed slow class cleanup on sites with many post metadata entries.
