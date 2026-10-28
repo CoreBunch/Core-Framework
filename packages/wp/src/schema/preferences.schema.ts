@@ -61,10 +61,10 @@ export const localPreferencesSchema = z.object({
 
 	/* LEGACY */
 	root_font_size: z.number().optional(),
-	postcss: z.boolean().optional().default(true).optional(),
+	postcss: z.boolean().optional(),
 	min_screen_width: z.number().optional(),
 	max_screen_width: z.number().optional(),
-	is_rem: z.boolean().default(true).optional(),
+	is_rem: z.boolean().optional(),
 });
 
 export const wpOptionsSchema = z.object({

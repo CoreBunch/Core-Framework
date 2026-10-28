@@ -43,7 +43,7 @@ export const fluidTypographyGroupSchema = z.object({
 	isDisabled: z.boolean().optional(),
 	isRem: z.boolean().optional(),
 	genFontSizeClass: z.boolean().optional().describe("Deprecated"),
-	mode: z.enum(["fluid", "fluid_manual"]).default("fluid").optional(),
+	mode: z.enum(["fluid", "fluid_manual"]).optional(),
 	manualSizes: z
 		.array(
 			z.object({

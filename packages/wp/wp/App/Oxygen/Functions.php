@@ -231,7 +231,8 @@ class Functions extends Base {
 	public function is_oxygen6(): bool {
 		include_once ABSPATH . 'wp-admin/includes/plugin.php';
 		if ( file_exists( WP_PLUGIN_DIR . '/oxygen/plugin.php' ) && is_plugin_active( 'oxygen/plugin.php' ) ) {
-			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/oxygen/plugin.php' );
+			// Detection runs before init; metadata must not trigger translation loading.
+			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/oxygen/plugin.php', false, false );
 			return version_compare( $plugin_data['Version'], '6.0', '>=' );
 		}
 		return false;
