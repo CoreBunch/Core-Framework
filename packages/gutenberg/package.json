@@ -19,7 +19,7 @@
 		"@wordpress/data": "^10.52.0",
 		"@wordpress/element": "^8.4.0",
 		"@wordpress/plugins": "^7.52.0",
-		"@wordpress/scripts": "^34.0.0",
+		"@wordpress/scripts": "^35.0.0",
 		"autoprefixer": "^10.5.4",
 		"glob": "^13.0.6",
 		"postcss": "^8.5.26"

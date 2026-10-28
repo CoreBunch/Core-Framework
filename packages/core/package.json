@@ -40,7 +40,7 @@
 		"postcss-value-parser": "^4.2.0",
     "sonner": "^0.3.5",
     "ulid": "^2.3.0",
-    "zod": "^3.21.4"
+    "zod": "^4.6.7"
   },
   "peerDependencies": {
     "react": "^18.2.0",

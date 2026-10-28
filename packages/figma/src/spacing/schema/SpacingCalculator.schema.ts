@@ -46,7 +46,7 @@ export const spacingGroupSchema = z.object({
 	genPadding: z.boolean().optional().describe("Deprecated"),
 	genGap: z.boolean().optional().describe("Deprecated"),
 	genAutoMargins: z.boolean().optional().describe("Deprecated"),
-	mode: z.enum(["fluid", "fluid_manual"]).default("fluid").optional(),
+	mode: z.enum(["fluid", "fluid_manual"]).optional(),
 	manualSizes: z
 		.array(
 			z.object({

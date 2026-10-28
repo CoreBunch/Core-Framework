@@ -6,7 +6,8 @@
 	"license": "MIT",
 	"packageManager": "bun@1.3.11",
 	"engines": {
-		"bun": ">=1.3.0 <1.4.0"
+		"bun": ">=1.3.0 <1.4.0",
+		"node": ">=22.19.0"
 	},
 	"homepage": "https://coreframework.com/",
 	"repository": {
@@ -18,6 +19,7 @@
 	},
 	"workspaces": ["packages/*"],
 	"overrides": {
+		"zod": "4.6.7",
 		"body-parser": "1.20.9",
 		"colord": "2.9.7",
 		"compression": "1.8.2",
@@ -30,7 +32,6 @@
 		"adm-zip": "0.6.1",
 		"@babel/core": "7.29.7",
 		"@babel/plugin-transform-modules-systemjs": "7.29.8",
-		"basic-ftp": "5.3.1",
 		"copy-webpack-plugin": "14.0.0",
 		"fast-uri": "3.1.9",
 		"flatted": "3.4.4",
@@ -55,7 +56,7 @@
 		"preinstall": "npx -y only-allow bun",
 		"lint": "bun run --filter './packages/www' lint && bun run --filter './packages/wp' lint",
 		"format": "sh ./scripts/format.sh",
-		"audit:security": "bun audit --audit-level=high --ignore=GHSA-jmr9-qjv8-65gv",
+		"audit:security": "bun audit --audit-level=high",
 		"check:open-source": "bun run scripts/check-open-source-boundaries.ts",
 		"fonts:refresh": "bun run scripts/build-google-fonts.ts",
 		"bump": "bun run scripts/version-change.ts",
