@@ -25,6 +25,6 @@
 		"@wordpress/blocks": "^15.25.0",
 		"@wordpress/browserslist-config": "^6.53.0",
 		"@wordpress/components": "^38.0.0",
-		"@wordpress/scripts": "^34.0.0"
+		"@wordpress/scripts": "^35.0.0"
 	}
 }

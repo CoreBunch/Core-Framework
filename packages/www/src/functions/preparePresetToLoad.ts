@@ -502,7 +502,7 @@ function replaceIncorrectBoldClass(preset: Preset): Preset {
 
 interface IPreparePresetToLoad {
 	readonly preset: WithOptionalProperty<MixedPreset, "preferences">;
-	readonly oldPreferences?: LocalPreferences | undefined;
+	readonly oldPreferences?: PresetPreferences | undefined;
 }
 
 export function preparePresetToLoad({ preset, oldPreferences: preferences }: IPreparePresetToLoad): Preset {

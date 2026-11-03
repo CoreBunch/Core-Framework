@@ -1,6 +1,6 @@
 {
 	"name": "coreframework",
-	"version": "2.0.2",
+	"version": "2.1.0",
 	"description": "The Core Framework WordPress plugin.",
 	"author": "David Babinec",
 	"license": "MIT",
@@ -46,7 +46,7 @@
 		"replace-in-files-cli": "^2.0.0",
 		"sass": "^1.102.0",
 		"typescript": "^5.9.3",
-		"vite": "^6.4.3",
+		"vite": "^6.4.5",
 		"vite-plugin-live-reload": "^3.1.0",
 		"vite-tsconfig-paths": "^6.1.1"
 	},
@@ -60,7 +60,7 @@
 		"@mantine/core": "^6.0.8",
 		"@mantine/hooks": "^6.0.8",
 		"clsx": "^1.2.1",
-		"colord": "^2.9.3",
+		"colord": "^2.9.7",
 		"compare-versions": "^6.1.0",
 		"fontkit": "^2.0.4",
 		"jotai": "^2.20.2",
@@ -73,6 +73,6 @@
 		"sonner": "^0.3.5",
 		"ts-pattern": "^4.3.0",
 		"ulid": "^2.3.0",
-		"zod": "^3.21.4"
+		"zod": "^4.6.7"
 	}
 }

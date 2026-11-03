@@ -11,7 +11,7 @@ Thanks for helping improve Core Framework. Contributions should keep projects po
 
 ## Local Development
 
-Use Bun for JavaScript dependencies and project commands:
+Use Bun 1.3.11 for JavaScript dependencies and project commands. WordPress build tooling also requires Node.js 22.19 or newer; CI uses Node.js 24:
 
 ```sh
 bun install

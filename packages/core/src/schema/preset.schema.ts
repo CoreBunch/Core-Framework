@@ -90,19 +90,21 @@ export const stylesGroupSchema = z.object({
 	type: z.enum(["variable"]).optional(),
 });
 
-export const groupsSchema = z.record(stylesheetDataKeysSchema, z.array(groupSchema));
+// Saved projects may contain only the categories they use.
+export const groupsSchema = z.partialRecord(stylesheetDataKeysSchema, z.array(groupSchema));
 
+// Missing preferences stay absent; the project loader applies the appropriate defaults.
 export const presetPreferencesSchema = z.object({
-	root_font_size: z.number().default(16).optional(),
-	postcss: z.boolean().default(true).optional(),
-	postcss_easing_gradients: z.boolean().default(false).optional(),
-	postcss_hover_media: z.boolean().default(false).optional(),
+	root_font_size: z.number().optional(),
+	postcss: z.boolean().optional(),
+	postcss_easing_gradients: z.boolean().optional(),
+	postcss_hover_media: z.boolean().optional(),
 	min_screen_width: z.number().optional(),
 	max_screen_width: z.number().optional(),
-	is_rem: z.boolean().default(true).optional(),
+	is_rem: z.boolean().optional(),
 	prefers_reduced_motion: z.boolean().optional(),
 	theme_mode: z.enum(["light", "dark", "auto"]).optional(),
-	is_add_group_comments: z.boolean().default(false).optional(),
+	is_add_group_comments: z.boolean().optional(),
 });
 
 export const presetSchema = z.object({
